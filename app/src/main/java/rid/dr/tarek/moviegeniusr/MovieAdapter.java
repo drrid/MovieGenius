@@ -38,7 +38,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void onBindViewHolder(MovieViewHolder holder, int position) {
         holder.title_list_item.setText(myList.get(position).getTitle());
         holder.year_list_item.setText(myList.get(position).getYear());
-        holder.subInfo_list_item.setText(myList.get(position).getSubInfo());
         holder.description_list_item.setText(myList.get(position).getDescription());
     }
 
@@ -51,16 +50,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public class MovieViewHolder extends RecyclerView.ViewHolder{
         TextView title_list_item;
         TextView year_list_item;
-        TextView subInfo_list_item;
         TextView description_list_item;
 
         public MovieViewHolder(View itemView) {
             super(itemView);
             title_list_item = (TextView)itemView.findViewById(R.id.tv_item_title);
             year_list_item = (TextView)itemView.findViewById(R.id.tv_item_year);
-            subInfo_list_item = (TextView)itemView.findViewById(R.id.tv_item_subInfo);
             description_list_item = (TextView)itemView.findViewById(R.id.tv_item_description);
-
         }
     }
 }

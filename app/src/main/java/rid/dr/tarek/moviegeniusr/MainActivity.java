@@ -1,6 +1,6 @@
 package rid.dr.tarek.moviegeniusr;
 
-import android.support.annotation.NonNull;
+import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +9,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     MovieAdapter movieAdapter;
     List<Movie> myList = new ArrayList<Movie>();
     MoviePresenter moviePresenter;
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +42,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBtnClick(View view) {
+        pd = ProgressDialog.show(this, "Loading...", "Generating 1080p movies");
         if(myList.isEmpty()){
             Observable.fromCallable(()->moviePresenter.getLatestMovies())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(movies -> bgInfoDownload(movies))
-                    .subscribe(movies -> updateAllList(movies),
+                    .subscribe(movies -> updateItems(movies),
                             throwable -> errBtn(throwable));
         }
     }
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(throwable.getMessage());
     }
 
-    private void updateAllList(List<Movie> movies) {
+    private void updateItems(List<Movie> movies) {
         myList.clear();
         myList.addAll(movies);
         movieAdapter.notifyDataSetChanged();
@@ -63,13 +66,14 @@ public class MainActivity extends AppCompatActivity {
     private void bgInfoDownload(List<Movie> movies){
         Observable.from(movies)
                 .map(movie -> moviePresenter.getInfo(movie))
+                .doOnCompleted(()->pd.dismiss())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(movie -> updateList(movie));
+                .subscribe(movie -> updateItem(movie));
 
     }
 
-    private void updateList(Movie movie) {
+    private void updateItem(Movie movie) {
         int i = myList.indexOf(movie);
         myList.remove(movie);
         myList.add(i, movie);

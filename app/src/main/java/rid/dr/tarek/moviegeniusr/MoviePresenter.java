@@ -1,5 +1,7 @@
 package rid.dr.tarek.moviegeniusr;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,13 +17,16 @@ import java.util.List;
 
 public class MoviePresenter {
 
-    final static String BASEURL = "http://www.google.com/search?q=";
+    private final static String OMDB_BASEURL = "http://www.omdbapi.com/?t=%s&y=%s&plot=short&r=json";
 
     public List<Movie> getLatestMovies() throws IOException {
 
         String title_fin;
+        String year;
+        String f_year;
         List<String> titles = new ArrayList<String>();
         List<Movie> movies = new ArrayList<Movie>();
+        List<String> years = new ArrayList<String>();
 
         Document movies_doc = Jsoup.connect("https://www.shaanig.org/f30/").get();
         Elements titles_els = movies_doc.getElementsByClass("threadtitle");
@@ -30,16 +35,20 @@ public class MoviePresenter {
         for(Element text_el: titles_els){
             if(text_el.text().contains("1080p")){
                 // String manipulation and cleaning
+                year = text_el.text().split("\\(", 2)[1];
+                year = year.split("\\)",2)[0];
                 title_fin = text_el.text().split("\\(", 2)[0];
                 title_fin = title_fin.replace("Sticky:", "").trim();
 
                 //populating titles and links to ArrayList
                 titles.add(title_fin);
+                years.add(year);
             }
         }
 
         for(String title:titles){
-            movies.add(new Movie(title,null,null,null,null));
+            f_year = years.get(titles.indexOf(title));
+            movies.add(new Movie(title,null,null,null,f_year));
         }
         return movies;
     }
@@ -49,45 +58,27 @@ public class MoviePresenter {
 
         Movie n_movie = movie;
         String q_title = n_movie.getTitle().replace(" ", "+");
+        String year = n_movie.getYear();
 
-        // get imdb link
-        Document doc = null;
+        JSONObject json = null;
         try {
-            doc = Jsoup.connect(BASEURL+q_title+"+IMDB").get();
+            String doc = Jsoup.connect(String.format(OMDB_BASEURL, q_title, year))
+                    .ignoreContentType(true).get().text();
+            json = new JSONObject(doc);
+
+            // get info
+            String description = json.getString("Plot");
+            String rating = json.getString("imdbRating");
+
+            // set info
+            n_movie.setDescription(description);
+            n_movie.setRating(rating);
+
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        Element result = doc.getElementsByClass("r").first();
-        String imdb_link = result.getElementsByAttribute("href").attr("href");
-
-
-        Document des_doc = null;
-        try {
-            des_doc = Jsoup.connect(imdb_link).get();
-        } catch (IOException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        // get description
-        String description = des_doc.getElementsByClass("summary_text").text();
-        n_movie.setDescription(description);
-
-        // get rating
-        String rating = des_doc.getElementsByClass("ratingValue").text();
-        n_movie.setRating(rating);
-
-        // get year
-        String year = des_doc.getElementById("titleYear").text();
-        n_movie.setYear(year);
-
-        // get subInfo
-        String subInfo = des_doc
-                .getElementsByClass("subtext")
-                .text()
-                .split("\\)")[0]
-                .concat(")");
-        n_movie.setSubInfo(subInfo);
-
         return  n_movie;
     }
 
