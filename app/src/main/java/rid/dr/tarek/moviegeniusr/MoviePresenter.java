@@ -1,5 +1,7 @@
 package rid.dr.tarek.moviegeniusr;
 
+import android.media.Image;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -7,7 +9,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +25,7 @@ import java.util.List;
 
 public class MoviePresenter {
 
+    private File path;
     private final static String OMDB_BASEURL = "http://www.omdbapi.com/?t=%s&y=%s&plot=short&r=json";
 
     public List<Movie> getLatestMovies() throws IOException {
@@ -53,7 +62,6 @@ public class MoviePresenter {
         return movies;
     }
 
-
     public Movie getInfo(Movie movie){
 
         Movie n_movie = movie;
@@ -69,8 +77,10 @@ public class MoviePresenter {
             // get info
             String description = json.getString("Plot");
             String rating = json.getString("imdbRating");
+            String poster_url = json.getString("Poster");
 
             // set info
+            n_movie.setPosterURL(poster_url);
             n_movie.setDescription(description);
             n_movie.setRating(rating);
 
@@ -82,4 +92,38 @@ public class MoviePresenter {
         return  n_movie;
     }
 
+    public Movie getPoster(Movie movie) {
+
+        Movie n_movie = movie;
+        try {
+            URL url = new URL(movie.getPosterURL());
+            InputStream in = new BufferedInputStream(url.openStream());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            int n = 0;
+
+            while (-1!=(n=in.read(buf))){
+                out.write(buf, 0, n);
+            }
+
+            out.close();
+            in.close();
+
+            byte[] response = out.toByteArray();
+            File file = new File(path, "/" + movie.getTitle()+".jpg");
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(response);
+            fos.close();
+
+            n_movie.setHasPoster(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return n_movie;
+    }
+
+    public void setPath(File path) {
+        this.path = path;
+    }
 }

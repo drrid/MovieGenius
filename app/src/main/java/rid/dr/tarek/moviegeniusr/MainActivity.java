@@ -1,15 +1,16 @@
 package rid.dr.tarek.moviegeniusr;
 
 import android.app.ProgressDialog;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     List<Movie> myList = new ArrayList<Movie>();
     MoviePresenter moviePresenter;
     ProgressDialog pd;
+    File path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,16 +31,19 @@ public class MainActivity extends AppCompatActivity {
         if(moviePresenter == null){
             moviePresenter = new MoviePresenter();
         }
+        path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
 
         //TODO: cach movies so when I enter the app I see the last downloaded info
 
         // init RecyclerView
         moviesList = (RecyclerView)findViewById(R.id.rv_movies);
-        movieAdapter = new MovieAdapter(myList, getApplication());
+        movieAdapter = new MovieAdapter(myList, getApplication(), path);
 
         moviesList.setHasFixedSize(true);
         moviesList.setLayoutManager(new LinearLayoutManager(this));
         moviesList.setAdapter(movieAdapter);
+
+        moviePresenter.setPath(path);
     }
 
     public void onBtnClick(View view) {
@@ -49,28 +54,36 @@ public class MainActivity extends AppCompatActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(movies -> bgInfoDownload(movies))
                     .subscribe(movies -> updateItems(movies),
-                            throwable -> errBtn(throwable));
+                            throwable -> errPrint(throwable));
         }
-    }
-
-    private void errBtn(Throwable throwable) {
-        System.out.println(throwable.getMessage());
-    }
-
-    private void updateItems(List<Movie> movies) {
-        myList.clear();
-        myList.addAll(movies);
-        movieAdapter.notifyDataSetChanged();
     }
 
     private void bgInfoDownload(List<Movie> movies){
         Observable.from(movies)
                 .map(movie -> moviePresenter.getInfo(movie))
-                .doOnCompleted(()->pd.dismiss())
+                .doOnCompleted(()->{
+                    pd.dismiss();
+                    bgPosterDownload(movies);
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(movie -> updateItem(movie));
+                .subscribe(movie -> updateItem(movie),
+                        throwable -> errPrint(throwable));
+    }
 
+    private void bgPosterDownload(List<Movie> movies){
+
+        Observable.from(movies)
+                .map(movie -> moviePresenter.getPoster(movie))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(movie -> updateItem(movie),
+                        throwable -> errPrint(throwable));
+    }
+
+
+    private void errPrint(Throwable throwable) {
+        System.out.println(throwable.getMessage());
     }
 
     private void updateItem(Movie movie) {
@@ -80,16 +93,9 @@ public class MainActivity extends AppCompatActivity {
         movieAdapter.notifyDataSetChanged();
     }
 
-
-//    private void testData() {
-//        myList.add(new Movie("Batman" , "The dark knight returns", null, null));
-//        myList.add(new Movie("Batman2", "The dark knight returns", null, null));
-//        myList.add(new Movie("Batman3", "The dark knight returns", null, null));
-//        myList.add(new Movie("Batman4", "The dark knight returns", null, null));
-//        myList.add(new Movie("Batman5", "The dark knight returns", null, null));
-//        myList.add(new Movie("Batman6", "The dark knight returns", null, null));
-//        myList.add(new Movie("Batman7", "The dark knight returns", null, null));
-//        myList.add(new Movie("Batman8", "The dark knight returns", null, null));
-//    }
-
+    private void updateItems(List<Movie> movies) {
+        myList.clear();
+        myList.addAll(movies);
+        movieAdapter.notifyDataSetChanged();
+    }
 }
