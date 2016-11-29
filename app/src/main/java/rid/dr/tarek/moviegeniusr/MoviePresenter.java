@@ -15,6 +15,8 @@ import java.util.List;
 
 public class MoviePresenter {
 
+    final static String BASEURL = "http://www.google.com/search?q=";
+
     public List<Movie> getLatestMovies() throws IOException {
 
         String title_fin;
@@ -37,10 +39,56 @@ public class MoviePresenter {
         }
 
         for(String title:titles){
-            movies.add(new Movie(title,null,null,null));
+            movies.add(new Movie(title,null,null,null,null));
         }
         return movies;
     }
 
+
+    public Movie getInfo(Movie movie){
+
+        Movie n_movie = movie;
+        String q_title = n_movie.getTitle().replace(" ", "+");
+
+        // get imdb link
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(BASEURL+q_title+"+IMDB").get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Element result = doc.getElementsByClass("r").first();
+        String imdb_link = result.getElementsByAttribute("href").attr("href");
+
+
+        Document des_doc = null;
+        try {
+            des_doc = Jsoup.connect(imdb_link).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // get description
+        String description = des_doc.getElementsByClass("summary_text").text();
+        n_movie.setDescription(description);
+
+        // get rating
+        String rating = des_doc.getElementsByClass("ratingValue").text();
+        n_movie.setRating(rating);
+
+        // get year
+        String year = des_doc.getElementById("titleYear").text();
+        n_movie.setYear(year);
+
+        // get subInfo
+        String subInfo = des_doc
+                .getElementsByClass("subtext")
+                .text()
+                .split("\\)")[0]
+                .concat(")");
+        n_movie.setSubInfo(subInfo);
+
+        return  n_movie;
+    }
 
 }
