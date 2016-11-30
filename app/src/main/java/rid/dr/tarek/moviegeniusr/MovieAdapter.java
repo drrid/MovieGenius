@@ -1,6 +1,7 @@
 package rid.dr.tarek.moviegeniusr;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +38,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.movie_list_item,parent, false);
         MovieViewHolder v_holder = new MovieViewHolder(v);
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int pos = v_holder.getAdapterPosition();
+                Context context = view.getContext();
+                Intent intent = new Intent(context, DetailActivity.class);
+                context.startActivity(intent);
+
+                System.out.println(String.valueOf(pos));
+            }
+        });
         return v_holder;
     }
 
