@@ -45,6 +45,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 int pos = v_holder.getAdapterPosition();
                 Context context = view.getContext();
                 Intent intent = new Intent(context, DetailActivity.class);
+                intent.putExtra("movie", myList.get(pos));
                 context.startActivity(intent);
 
                 System.out.println(String.valueOf(pos));

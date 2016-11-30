@@ -1,12 +1,13 @@
 package rid.dr.tarek.moviegeniusr;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  * Created by Tarek on 11/28/2016.
  */
 
-public class Movie {
+public class Movie implements Serializable{
     private String title;
     private String description;
     private String subInfo;
@@ -14,6 +15,9 @@ public class Movie {
     private String year;
     private String posterURL;
     private boolean hasPoster;
+    private String pathToPoster;
+    private String imdbID;
+    private String duration;
 
     public Movie(String title, String description, String subInfo, String rating, String year) {
         this.title = title;
@@ -21,6 +25,18 @@ public class Movie {
         this.subInfo = subInfo;
         this.rating = rating;
         this.year = year;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public String getPathToPoster() {
+        return pathToPoster;
+    }
+
+    public void setPathToPoster(String pathToPoster) {
+        this.pathToPoster = pathToPoster;
     }
 
     public String getTitle() {
@@ -87,5 +103,21 @@ public class Movie {
 
     public void setHasPoster(boolean hasPoster) {
         this.hasPoster = hasPoster;
+    }
+
+    public void setImdbID(String imdbID) {
+        this.imdbID = imdbID;
+    }
+
+    public String getImdbID() {
+        return imdbID;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getDuration() {
+        return duration;
     }
 }

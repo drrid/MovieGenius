@@ -28,6 +28,10 @@ public class MoviePresenter {
     private File path;
     private final static String OMDB_BASEURL = "http://www.omdbapi.com/?t=%s&y=%s&plot=short&r=json";
 
+    public void setPath(File path) {
+        this.path = path;
+    }
+
     public List<Movie> getLatestMovies() throws IOException {
 
         String title_fin;
@@ -78,11 +82,15 @@ public class MoviePresenter {
             String description = json.getString("Plot");
             String rating = json.getString("imdbRating");
             String poster_url = json.getString("Poster");
+            String imdbID = json.getString("imdbID");
+            String duration = json.getString("Runtime");
 
             // set info
             n_movie.setPosterURL(poster_url);
             n_movie.setDescription(description);
             n_movie.setRating(rating);
+            n_movie.setImdbID(imdbID);
+            n_movie.setDuration(duration);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,7 +123,10 @@ public class MoviePresenter {
             fos.write(response);
             fos.close();
 
+            String pathToPoster = file.getPath();
+            n_movie.setPathToPoster(pathToPoster);
             n_movie.setHasPoster(true);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,7 +134,5 @@ public class MoviePresenter {
         return n_movie;
     }
 
-    public void setPath(File path) {
-        this.path = path;
-    }
+
 }
