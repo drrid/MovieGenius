@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -42,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
         moviesList.setHasFixedSize(true);
         moviesList.setLayoutManager(new LinearLayoutManager(this));
         moviesList.setAdapter(movieAdapter);
+        DividerItemDecoration dividerItemDecoration =
+                new DividerItemDecoration(moviesList.getContext(),1);
+        moviesList.addItemDecoration(dividerItemDecoration);
 
         moviePresenter.setPath(path);
     }
