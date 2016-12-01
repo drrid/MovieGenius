@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -42,12 +43,24 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Movie movie = (Movie)intent.getSerializableExtra("movie");
 
-
         //set poster img
-        Observable.fromCallable(()->detailPresenter.setPosterImg(movie))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(img ->poster.setImageBitmap(img));
+        if(movie.isHasPoster()){
+            Observable.fromCallable(()->detailPresenter.setPosterImg(movie))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(img ->poster.setImageBitmap(img),
+                            throwable -> Log.d("TITO", "setPoster: "+throwable));
+        }
+
+        //set background img
+        if(movie.isHasBackground()){
+            Observable.fromCallable(()->detailPresenter.setBackgroundImg(movie))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(img ->background.setImageBitmap(img),
+                            throwable -> Log.d("TITO", "setPoster: "+throwable));
+            System.out.println(movie.getTitle());
+        }
 
         //set textviews
         title.setText(movie.getTitle());

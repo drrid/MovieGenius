@@ -1,6 +1,7 @@
 package rid.dr.tarek.moviegeniusr;
 
 import android.media.Image;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +28,7 @@ public class MoviePresenter {
 
     private File path;
     private final static String OMDB_BASEURL = "http://www.omdbapi.com/?t=%s&y=%s&plot=short&r=json";
+    private String BASEURL = "https://www.google.com/search?q=";
 
     public void setPath(File path) {
         this.path = path;
@@ -103,36 +105,95 @@ public class MoviePresenter {
     public Movie getPoster(Movie movie) {
 
         Movie n_movie = movie;
-        try {
-            URL url = new URL(movie.getPosterURL());
-            InputStream in = new BufferedInputStream(url.openStream());
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buf = new byte[1024];
-            int n = 0;
+        File file_check = new File(path, "/" + movie.getTitle()+".jpg");
 
-            while (-1!=(n=in.read(buf))){
-                out.write(buf, 0, n);
-            }
-
-            out.close();
-            in.close();
-
-            byte[] response = out.toByteArray();
-            File file = new File(path, "/" + movie.getTitle()+".jpg");
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(response);
-            fos.close();
-
-            String pathToPoster = file.getPath();
+        if(file_check.exists()){
+            String pathToPoster = file_check.getPath();
             n_movie.setPathToPoster(pathToPoster);
             n_movie.setHasPoster(true);
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        else{
+            try {
+                URL url = new URL(movie.getPosterURL());
+                InputStream in = new BufferedInputStream(url.openStream());
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                byte[] buf = new byte[1024];
+                int n = 0;
 
+                while (-1!=(n=in.read(buf))){
+                    out.write(buf, 0, n);
+                }
+
+                out.close();
+                in.close();
+
+                byte[] response = out.toByteArray();
+                File file = new File(path, "/" + movie.getTitle()+".jpg");
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(response);
+                fos.close();
+
+                String pathToPoster = file.getPath();
+                n_movie.setPathToPoster(pathToPoster);
+                n_movie.setHasPoster(true);
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return n_movie;
     }
 
+    public Movie getBackground(Movie movie) {
+        Movie n_movie = movie;
+        String q_title = n_movie.getTitle().replace(" ", "+");
+        File file_check = new File(path, "/" + movie.getTitle() + "-bg" + ".jpg");
+        Log.d("TITO", "getBackground: "+movie.getTitle());
+        if(file_check.exists()){
+            String pathToBackground = file_check.getPath();
+            n_movie.setPathToBackground(pathToBackground);
+            n_movie.setHasBackground(true);
+        }
+        else{
+            try {
+                Document g_doc = Jsoup.connect(BASEURL+q_title+"+fanart.tv").get();
+                Element g_el = g_doc.getElementsByClass("r").first();
+                String fanart_url = g_el.getElementsByAttribute("href").attr("href");
 
+                Document doc = Jsoup.connect(fanart_url).get();
+                Element el = doc.getElementsByClass("artwork moviethumb").first();
+                String bgImgURL = el.getElementsByAttribute("href").attr("href");
+                bgImgURL = "https://fanart.tv"+bgImgURL;
+                System.out.println(bgImgURL);
+
+                URL url = new URL(bgImgURL);
+                InputStream in = new BufferedInputStream(url.openStream());
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                byte[] buf = new byte[1024];
+                int n = 0;
+
+                while (-1!=(n=in.read(buf))){
+                    out.write(buf, 0, n);
+                }
+
+                out.close();
+                in.close();
+
+                byte[] response = out.toByteArray();
+                File file = new File(path, "/" + movie.getTitle() + "-bg" + ".jpg");
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(response);
+                fos.close();
+
+                String pathToBackground = file.getPath();
+                n_movie.setPathToBackground(pathToBackground);
+                n_movie.setHasBackground(true);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return n_movie;
+    }
 }

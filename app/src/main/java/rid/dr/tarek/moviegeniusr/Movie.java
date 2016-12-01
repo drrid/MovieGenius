@@ -14,10 +14,12 @@ public class Movie implements Serializable{
     private String rating;
     private String year;
     private String posterURL;
-    private boolean hasPoster;
+    private boolean hasPoster = false;
     private String pathToPoster;
     private String imdbID;
     private String duration;
+    private String pathToBackground;
+    private boolean hasBackground = false;
 
     public Movie(String title, String description, String subInfo, String rating, String year) {
         this.title = title;
@@ -88,7 +90,6 @@ public class Movie implements Serializable{
         return title.hashCode();
     }
 
-
     public void setPosterURL(String posterURL) {
         this.posterURL = posterURL;
     }
@@ -119,5 +120,21 @@ public class Movie implements Serializable{
 
     public String getDuration() {
         return duration;
+    }
+
+    public void setPathToBackground(String pathToBackground) {
+        this.pathToBackground = pathToBackground;
+    }
+
+    public String getPathToBackground() {
+        return pathToBackground;
+    }
+
+    public void setHasBackground(boolean hasBackground) {
+        this.hasBackground = hasBackground;
+    }
+
+    public boolean isHasBackground() {
+        return hasBackground;
     }
 }

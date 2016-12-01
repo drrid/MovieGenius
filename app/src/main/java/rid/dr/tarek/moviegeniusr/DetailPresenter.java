@@ -16,4 +16,10 @@ public class DetailPresenter {
         Bitmap img = BitmapFactory.decodeFile(file.getPath());
         return img;
     }
+
+    public Bitmap setBackgroundImg(Movie movie) {
+        File file = new File(movie.getPathToBackground());
+        Bitmap img = BitmapFactory.decodeFile(file.getPath());
+        return img;
+    }
 }
