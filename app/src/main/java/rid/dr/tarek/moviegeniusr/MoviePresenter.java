@@ -39,9 +39,11 @@ public class MoviePresenter {
         String title_fin;
         String year;
         String f_year;
+        String b_url;
         List<String> titles = new ArrayList<String>();
         List<Movie> movies = new ArrayList<Movie>();
         List<String> years = new ArrayList<String>();
+        List<String> b_urls = new ArrayList<String>();
 
         Document movies_doc = Jsoup.connect("https://www.shaanig.org/f30/").get();
         Elements titles_els = movies_doc.getElementsByClass("threadtitle");
@@ -55,16 +57,22 @@ public class MoviePresenter {
                 title_fin = text_el.text().split("\\(", 2)[0];
                 title_fin = title_fin.replace("Sticky:", "").trim();
 
+                //getting shaanig url
+                String b_urlf = text_el.getElementsByAttribute("href").attr("href");
+
                 //populating titles and links to ArrayList
                 titles.add(title_fin);
                 years.add(year);
+                b_urls.add(b_urlf);
+
             }
         }
 
         for(String title:titles){
             f_year = years.get(titles.indexOf(title));
-            if(!movies.contains(new Movie(title, null, null, null, null))){
-                movies.add(new Movie(title,null,null,null,f_year));
+            b_url = b_urls.get(titles.indexOf(title));
+            if(!movies.contains(new Movie(title, null, null, null, null, null))){
+                movies.add(new Movie(title,null,null,null,f_year, b_url));
             }
         }
         return movies;
@@ -80,6 +88,7 @@ public class MoviePresenter {
         try {
             String doc = Jsoup.connect(String.format(OMDB_BASEURL, q_title, year))
                     .ignoreContentType(true).get().text();
+
             json = new JSONObject(doc);
 
             // get info
@@ -95,6 +104,7 @@ public class MoviePresenter {
             n_movie.setRating(rating);
             n_movie.setImdbID(imdbID);
             n_movie.setDuration(duration);
+
 
         } catch (IOException e) {
             Log.d(TAG, "getInfo: "+ e.getMessage());
@@ -194,6 +204,18 @@ public class MoviePresenter {
                 Log.d(TAG, "getBackground: "+ e.getMessage());
             }
         }
+        return n_movie;
+    }
+
+    public Movie getURL(Movie movie) throws IOException {
+
+        Movie n_movie = movie;
+        String b_url = n_movie.getBURL();
+        String url = Jsoup.connect(b_url).get().getElementsByClass("downloadbutton_attachments")
+                .first().getElementsByAttribute("href").attr("href");
+        n_movie.setURL(url);
+        Log.d(TAG, "getURL: "+url);
+
         return n_movie;
     }
 }

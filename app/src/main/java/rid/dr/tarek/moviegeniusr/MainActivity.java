@@ -10,15 +10,15 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView moviesListRV;
@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private MoviePresenter moviePresenter;
     private ProgressDialog pd;
     private File path;
-    private CompositeSubscription ss = new CompositeSubscription();
     private static final String TAG = "DRRID";
 
     //TODO: create observable for items and subscribe to it from detailActivity
@@ -43,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if(pd.isShowing()){
             pd.dismiss();
-            ss.unsubscribe();
+//            ss.unsubscribe();
         }
         super.onBackPressed();
     }
@@ -77,52 +76,63 @@ public class MainActivity extends AppCompatActivity {
 
     public void onBtnClick(View view) {
         pd = ProgressDialog.show(this, "Loading...", "Generating 1080p movies");
-        Subscription s1 = Observable
+        Observable
                 .fromCallable(()->moviePresenter.getLatestMovies())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(movies -> bgInfoDownload(movies))
-                .doOnCompleted(()->pd.dismiss())
                 .subscribe(movies -> updateItems(movies),
                         throwable -> errPrint(throwable));
-        ss.add(s1);
+
     }
 
     private void bgInfoDownload(List<Movie> movies){
-        Subscription s2 = Observable
-                .from(movies)
+        Observable
+                .fromIterable(movies)
                 .map(movie -> moviePresenter.getInfo(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(movie-> bgPosterDownload(movie))
+                .doOnComplete(()->pd.dismiss())
+                .doOnNext(movie-> bgURLDownload(movie))
                 .subscribe(movie -> updateItem(movie),
                         throwable -> errPrint(throwable));
-        ss.add(s2);
+
     }
 
     private void bgPosterDownload(Movie movie){
-        Subscription s3 = Observable
+        Observable
                 .fromCallable(() -> moviePresenter.getPoster(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(mv->bgThumbDownload(mv))
                 .subscribe(mv -> updateItem(mv),
                         throwable -> errPrint(throwable));
-        ss.add(s3);
+
     }
 
     private void bgThumbDownload(Movie movie) {
-        Subscription s4 = Observable
+        Observable
                 .fromCallable(() -> moviePresenter.getBackground(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mv -> updateItem(mv),
                         throwable -> errPrint(throwable));
-        ss.add(s4);
+
+    }
+
+    private void bgURLDownload(Movie movie){
+        Observable
+                .fromCallable(() -> moviePresenter.getURL(movie))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(mv -> bgPosterDownload(mv))
+                .subscribe(mv -> updateItem(mv),
+                        throwable -> errPrint(throwable));
+
     }
 
     private void errPrint(Throwable throwable) {
-        Log.d(TAG, "errPrint: "+ throwable);
+        Log.d(TAG, "errPrint: "+ throwable.getMessage());
     }
 
     private void updateItem(Movie movie) {

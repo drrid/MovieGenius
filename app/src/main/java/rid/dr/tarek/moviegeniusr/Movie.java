@@ -21,13 +21,17 @@ public class Movie implements Serializable{
     private String duration = "Duration";
     private String pathToBackground = "pathToBG";
     private boolean hasBackground = false;
+    private String b_url = "none";
+    private String URL = "none";
 
-    public Movie(String title, String description, String subInfo, String rating, String year) {
+    public Movie(String title, String description, String subInfo,
+                 String rating, String year, String b_url) {
         this.title = title;
         this.description = description;
         this.subInfo = subInfo;
         this.rating = rating;
         this.year = year;
+        this.b_url =b_url;
     }
 
     public String getRating() {
@@ -137,5 +141,17 @@ public class Movie implements Serializable{
 
     public boolean isHasBackground() {
         return hasBackground;
+    }
+
+    public String getBURL() {
+        return b_url;
+    }
+
+    public void setURL(String URL) {
+        this.URL = URL;
+    }
+
+    public String getURL() {
+        return URL;
     }
 }
