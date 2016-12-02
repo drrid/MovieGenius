@@ -21,13 +21,16 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
-    RecyclerView moviesList;
-    MovieAdapter movieAdapter;
-    List<Movie> myList = new ArrayList<Movie>();
-    MoviePresenter moviePresenter;
-    ProgressDialog pd;
-    File path;
-    CompositeSubscription ss = new CompositeSubscription();
+    private RecyclerView moviesListRV;
+    private MovieAdapter movieAdapter;
+    private List<Movie> myList = new ArrayList<Movie>();
+    private MoviePresenter moviePresenter;
+    private ProgressDialog pd;
+    private File path;
+    private CompositeSubscription ss = new CompositeSubscription();
+    private static final String TAG = "DRRID";
+
+    //TODO: create observable for items and subscribe to it from detailActivity
 
     @Override
     protected void onPause() {
@@ -49,76 +52,77 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //create movie presenter
         if(moviePresenter == null){
             moviePresenter = new MoviePresenter();
         }
+
+        //init imgs path and pass it to Presenter
         path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
+        moviePresenter.setPath(path);
 
         //TODO: cach movies so when I enter the app I see the last downloaded info
 
         // init RecyclerView
-        moviesList = (RecyclerView)findViewById(R.id.rv_movies);
+        moviesListRV = (RecyclerView)findViewById(R.id.rv_movies);
         movieAdapter = new MovieAdapter(myList, getApplication(), path);
-
-        moviesList.setHasFixedSize(true);
-        moviesList.setLayoutManager(new LinearLayoutManager(this));
-        moviesList.setAdapter(movieAdapter);
+        moviesListRV.setHasFixedSize(true);
+        moviesListRV.setLayoutManager(new LinearLayoutManager(this));
+        moviesListRV.setAdapter(movieAdapter);
         DividerItemDecoration dividerItemDecoration =
-                new DividerItemDecoration(moviesList.getContext(),1);
-        moviesList.addItemDecoration(dividerItemDecoration);
-
-        moviePresenter.setPath(path);
+                new DividerItemDecoration(moviesListRV.getContext(),1);
+        moviesListRV.addItemDecoration(dividerItemDecoration);
     }
 
     public void onBtnClick(View view) {
         pd = ProgressDialog.show(this, "Loading...", "Generating 1080p movies");
-        Subscription s1 = Observable.fromCallable(()->moviePresenter.getLatestMovies())
+        Subscription s1 = Observable
+                .fromCallable(()->moviePresenter.getLatestMovies())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(movies -> bgInfoDownload(movies))
+                .doOnCompleted(()->pd.dismiss())
                 .subscribe(movies -> updateItems(movies),
                         throwable -> errPrint(throwable));
         ss.add(s1);
     }
 
     private void bgInfoDownload(List<Movie> movies){
-        Subscription s2 = Observable.from(movies)
+        Subscription s2 = Observable
+                .from(movies)
                 .map(movie -> moviePresenter.getInfo(movie))
-                .doOnCompleted(()->{
-                    pd.dismiss();
-                    bgPosterDownload(movies);
-                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(movie-> bgPosterDownload(movie))
                 .subscribe(movie -> updateItem(movie),
                         throwable -> errPrint(throwable));
-
         ss.add(s2);
     }
 
-    private void bgPosterDownload(List<Movie> movies){
-
-        Subscription s3 = Observable.from(movies)
-                .map(movie -> moviePresenter.getPoster(movie))
+    private void bgPosterDownload(Movie movie){
+        Subscription s3 = Observable
+                .fromCallable(() -> moviePresenter.getPoster(movie))
                 .subscribeOn(Schedulers.io())
-                .doOnNext(movie->bgThumbDownload(movie))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(movie -> updateItem(movie),
+                .doOnNext(mv->bgThumbDownload(mv))
+                .subscribe(mv -> updateItem(mv),
                         throwable -> errPrint(throwable));
-
         ss.add(s3);
     }
 
     private void bgThumbDownload(Movie movie) {
-        Observable.fromCallable(() -> moviePresenter.getBackground(movie))
+        Subscription s4 = Observable
+                .fromCallable(() -> moviePresenter.getBackground(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mv -> updateItem(mv),
                         throwable -> errPrint(throwable));
+        ss.add(s4);
     }
 
     private void errPrint(Throwable throwable) {
-        Log.d("TITO", "errPrint: "+ throwable);
+        Log.d(TAG, "errPrint: "+ throwable);
     }
 
     private void updateItem(Movie movie) {

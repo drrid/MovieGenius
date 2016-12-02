@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="rid.dr.tarek.moviegeniusr.DetailActivity"
-    android:background="#fff"
+    android:background="#f1f1f1"
     android:clipToPadding="false"
     android:clipChildren="false">
 
@@ -46,7 +46,8 @@
         android:layout_alignParentEnd="true"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_add_black_24dp"/>
+        android:src="@drawable/ic_add_black_24dp"
+        android:onClick="onAddBtnClick"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -95,9 +96,12 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="109dp"
-        android:elevation="6dp"
+        android:elevation="8dp"
         android:background="@color/colorAccent"
         android:scaleType="fitXY"
+        android:translationZ="10dp"
+        android:clickable="true"
+        android:focusable="true"
         android:outlineProvider="bounds"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"

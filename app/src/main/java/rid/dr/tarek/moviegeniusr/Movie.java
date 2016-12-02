@@ -1,24 +1,25 @@
 package rid.dr.tarek.moviegeniusr;
 
-import java.io.File;
+
 import java.io.Serializable;
+
 
 /**
  * Created by Tarek on 11/28/2016.
  */
 
 public class Movie implements Serializable{
-    private String title;
-    private String description;
-    private String subInfo;
-    private String rating;
-    private String year;
-    private String posterURL;
+    private String title = "title";
+    private String description = "des";
+    private String subInfo = "subInfo";
+    private String rating = "rating";
+    private String year = "year";
+    private String posterURL = "posterURL";
     private boolean hasPoster = false;
-    private String pathToPoster;
-    private String imdbID;
-    private String duration;
-    private String pathToBackground;
+    private String pathToPoster = "pathToPoster";
+    private String imdbID = "ID";
+    private String duration = "Duration";
+    private String pathToBackground = "pathToBG";
     private boolean hasBackground = false;
 
     public Movie(String title, String description, String subInfo, String rating, String year) {

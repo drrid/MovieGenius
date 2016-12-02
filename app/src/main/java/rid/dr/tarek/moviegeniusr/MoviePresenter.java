@@ -1,6 +1,5 @@
 package rid.dr.tarek.moviegeniusr;
 
-import android.media.Image;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -26,9 +25,10 @@ import java.util.List;
 
 public class MoviePresenter {
 
+    private static final String TAG = "DRRID";
     private File path;
     private final static String OMDB_BASEURL = "http://www.omdbapi.com/?t=%s&y=%s&plot=short&r=json";
-    private String BASEURL = "https://www.google.com/search?q=";
+    private final static String BASEURL = "https://www.google.com/search?q=";
 
     public void setPath(File path) {
         this.path = path;
@@ -63,7 +63,9 @@ public class MoviePresenter {
 
         for(String title:titles){
             f_year = years.get(titles.indexOf(title));
-            movies.add(new Movie(title,null,null,null,f_year));
+            if(!movies.contains(new Movie(title, null, null, null, null))){
+                movies.add(new Movie(title,null,null,null,f_year));
+            }
         }
         return movies;
     }
@@ -95,9 +97,9 @@ public class MoviePresenter {
             n_movie.setDuration(duration);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d(TAG, "getInfo: "+ e.getMessage());
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.d(TAG, "getInfo: "+ e.getMessage());
         }
         return  n_movie;
     }
@@ -139,7 +141,7 @@ public class MoviePresenter {
 
 
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.d(TAG, "getPoster: "+ e.getMessage());
             }
         }
         return n_movie;
@@ -149,7 +151,6 @@ public class MoviePresenter {
         Movie n_movie = movie;
         String q_title = n_movie.getTitle().replace(" ", "+");
         File file_check = new File(path, "/" + movie.getTitle() + "-bg" + ".jpg");
-        Log.d("TITO", "getBackground: "+movie.getTitle());
         if(file_check.exists()){
             String pathToBackground = file_check.getPath();
             n_movie.setPathToBackground(pathToBackground);
@@ -165,7 +166,6 @@ public class MoviePresenter {
                 Element el = doc.getElementsByClass("artwork moviethumb").first();
                 String bgImgURL = el.getElementsByAttribute("href").attr("href");
                 bgImgURL = "https://fanart.tv"+bgImgURL;
-                System.out.println(bgImgURL);
 
                 URL url = new URL(bgImgURL);
                 InputStream in = new BufferedInputStream(url.openStream());
@@ -191,7 +191,7 @@ public class MoviePresenter {
                 n_movie.setHasBackground(true);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.d(TAG, "getBackground: "+ e.getMessage());
             }
         }
         return n_movie;

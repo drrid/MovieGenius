@@ -1,22 +1,21 @@
 package rid.dr.tarek.moviegeniusr;
 
 import android.content.Intent;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.io.File;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class DetailActivity extends AppCompatActivity {
-    File path;
-    DetailPresenter detailPresenter;
+
+    private DetailPresenter detailPresenter;
+    private static final String TAG = "DRRID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,9 +26,7 @@ public class DetailActivity extends AppCompatActivity {
             detailPresenter = new DetailPresenter();
         }
 
-        // init path and views
-        path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
-
+        // init views
         ImageView poster = (ImageView)findViewById(R.id.poster);
         ImageView background = (ImageView)findViewById(R.id.background);
 
@@ -49,7 +46,7 @@ public class DetailActivity extends AppCompatActivity {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(img ->poster.setImageBitmap(img),
-                            throwable -> Log.d("TITO", "setPoster: "+throwable));
+                            throwable -> Log.d(TAG, "setPoster: "+throwable));
         }
 
         //set background img
@@ -58,8 +55,7 @@ public class DetailActivity extends AppCompatActivity {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(img ->background.setImageBitmap(img),
-                            throwable -> Log.d("TITO", "setPoster: "+throwable));
-            System.out.println(movie.getTitle());
+                            throwable -> Log.d(TAG, "setBackground: "+throwable));
         }
 
         //set textviews
@@ -70,4 +66,7 @@ public class DetailActivity extends AppCompatActivity {
         description.setText(movie.getDescription());
     }
 
+    public void onAddBtnClick(View view) {
+
+    }
 }

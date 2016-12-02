@@ -22,9 +22,9 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
-    List<Movie> myList = Collections.emptyList();
-    Context context;
-    File path;
+    private List<Movie> myList = Collections.emptyList();
+    private Context context;
+    private File path;
 
     public MovieAdapter(List<Movie> myList, Context context,File path) {
         this.myList = myList;
@@ -47,8 +47,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 Intent intent = new Intent(context, DetailActivity.class);
                 intent.putExtra("movie", myList.get(pos));
                 context.startActivity(intent);
-
-                System.out.println(String.valueOf(pos));
             }
         });
         return v_holder;
@@ -71,7 +69,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public int getItemCount() {
         return myList.size();
     }
-
 
     public class MovieViewHolder extends RecyclerView.ViewHolder{
         TextView title_list_item;
