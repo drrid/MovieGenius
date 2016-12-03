@@ -66,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
                 .fromCallable(()->moviePresenter.getLatestMovies())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(movies -> bgInfoDownload(movies))
-                .doOnCompleted(()->pd.dismiss())
-                .subscribe(movies -> updateItems(movies),
+                .doOnNext(movies -> updateItems(movies))
+                .retry()
+                .subscribe(movies -> bgInfoDownload(movies),
                         throwable -> errPrint(throwable));
         ss.add(s1);
     }
@@ -79,10 +79,19 @@ public class MainActivity extends AppCompatActivity {
                 .map(movie -> moviePresenter.getInfo(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(mv-> bgGetTorrent(mv))
-                .subscribe(movie -> updateItem(movie),
+
+                .subscribe(mv-> bgGetTorrent(mv),
                         throwable -> errPrint(throwable));
         ss.add(s2);
+    }
+
+    private void bgGetTorrent(Movie movie){
+        Observable.fromCallable(()->moviePresenter.getTorrent(movie))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(mv-> bgPosterDownload(mv))
+                .subscribe(mv->updateItem(mv),
+                        throwable -> errPrint(throwable));
     }
 
     private void bgPosterDownload(Movie movie){
@@ -90,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
                 .fromCallable(() -> moviePresenter.getPoster(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(mv->bgThumbDownload(mv))
-                .subscribe(mv -> updateItem(mv),
+                .doOnCompleted(()->pd.dismiss())
+                .subscribe(mv->updateItem(mv),
                         throwable -> errPrint(throwable));
         ss.add(s3);
     }
@@ -106,14 +115,6 @@ public class MainActivity extends AppCompatActivity {
         ss.add(s4);
     }
 
-    private void bgGetTorrent(Movie movie){
-        Observable.fromCallable(()->moviePresenter.getTorrent(movie))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(mv-> bgPosterDownload(mv))
-                .subscribe(mv->updateItem(mv),
-                        throwable -> errPrint(throwable));
-    }
 
     private void errPrint(Throwable throwable) {
         Log.d(TAG, "errPrint: "+ throwable);
