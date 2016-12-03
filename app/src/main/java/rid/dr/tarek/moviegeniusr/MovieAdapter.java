@@ -15,6 +15,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 
 /**
  * Created by Tarek on 11/27/2016.
@@ -59,10 +63,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         holder.description_list_item.setText(myList.get(position).getDescription());
 
         if (myList.get(position).isHasPoster()){
-            File file = new File(path, "/" + myList.get(position).getTitle()+".jpg");
-            Bitmap img = BitmapFactory.decodeFile(file.getPath());
-            holder.poster_img_item.setImageBitmap(img);
+            Observable.fromCallable(()->getBitmap(position))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(img->{
+                        holder.poster_img_item.setImageBitmap(img);
+                    });
         }
+    }
+
+    private Bitmap getBitmap(int position) {
+        File file = new File(path, "/" + myList.get(position).getTitle()+".jpg");
+        return BitmapFactory.decodeFile(file.getPath());
     }
 
     @Override

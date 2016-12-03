@@ -84,9 +84,10 @@ public class DetailActivity extends AppCompatActivity {
         emailIntent.putExtra(Intent.EXTRA_TEXT, movie.getTorrentURL());
 
         try {
-            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            startActivity(Intent.createChooser(emailIntent, "Please choose Gmail..."));
             finish();
-            Log.i("Finished sending email", "");
+            Toast.makeText(DetailActivity.this,
+                    "Torrent added successfully", Toast.LENGTH_SHORT).show();
         } catch (android.content.ActivityNotFoundException ex) {
             Toast.makeText(DetailActivity.this,
                     "There is no email client installed.", Toast.LENGTH_SHORT).show();
