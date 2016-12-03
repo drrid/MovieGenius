@@ -43,10 +43,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             @Override
             public void onClick(View view) {
                 int pos = v_holder.getAdapterPosition();
-                Context context = view.getContext();
-                Intent intent = new Intent(context, DetailActivity.class);
+                Context context1 = view.getContext();
+                Intent intent = new Intent(context1, DetailActivity.class);
                 intent.putExtra("movie", myList.get(pos));
-                context.startActivity(intent);
+                context1.startActivity(intent);
             }
         });
         return v_holder;

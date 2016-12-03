@@ -9,25 +9,25 @@ import java.io.Serializable;
  */
 
 public class Movie implements Serializable{
-    private String title = "title";
-    private String description = "des";
-    private String subInfo = "subInfo";
-    private String rating = "rating";
-    private String year = "year";
-    private String posterURL = "posterURL";
+    private String b_URL = null;
+    private String title = null;
+    private String description = null;
+    private String subInfo = null;
+    private String rating = null;
+    private String year = null;
+    private String posterURL = null;
     private boolean hasPoster = false;
-    private String pathToPoster = "pathToPoster";
-    private String imdbID = "ID";
-    private String duration = "Duration";
-    private String pathToBackground = "pathToBG";
+    private String pathToPoster = null;
+    private String imdbID = null;
+    private String duration = null;
+    private String pathToBackground = null;
     private boolean hasBackground = false;
+    private String torrentURL = null;
 
-    public Movie(String title, String description, String subInfo, String rating, String year) {
+    public Movie(String title, String year, String b_URL) {
         this.title = title;
-        this.description = description;
-        this.subInfo = subInfo;
-        this.rating = rating;
         this.year = year;
+        this.b_URL = b_URL;
     }
 
     public String getRating() {
@@ -137,5 +137,17 @@ public class Movie implements Serializable{
 
     public boolean isHasBackground() {
         return hasBackground;
+    }
+
+    public String getBaseURL() {
+        return b_URL;
+    }
+
+    public void setTorrentURL(String torrentURL) {
+        this.torrentURL = torrentURL;
+    }
+
+    public String getTorrentURL() {
+        return torrentURL;
     }
 }

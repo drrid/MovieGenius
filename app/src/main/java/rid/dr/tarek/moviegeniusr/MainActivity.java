@@ -21,6 +21,7 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
+
     private RecyclerView moviesListRV;
     private MovieAdapter movieAdapter;
     private List<Movie> myList = new ArrayList<Movie>();
@@ -31,22 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DRRID";
 
     //TODO: create observable for items and subscribe to it from detailActivity
-
-    @Override
-    protected void onPause() {
-//        ss.unsubscribe();
-        super.onPause();
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(pd.isShowing()){
-            pd.dismiss();
-            ss.unsubscribe();
-        }
-        super.onBackPressed();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 .map(movie -> moviePresenter.getInfo(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(movie-> bgPosterDownload(movie))
+                .doOnNext(mv-> bgGetTorrent(mv))
                 .subscribe(movie -> updateItem(movie),
                         throwable -> errPrint(throwable));
         ss.add(s2);
@@ -111,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         ss.add(s3);
     }
 
-    private void bgThumbDownload(Movie movie) {
+    private void bgThumbDownload(Movie movie){
         Subscription s4 = Observable
                 .fromCallable(() -> moviePresenter.getBackground(movie))
                 .subscribeOn(Schedulers.io())
@@ -119,6 +104,15 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(mv -> updateItem(mv),
                         throwable -> errPrint(throwable));
         ss.add(s4);
+    }
+
+    private void bgGetTorrent(Movie movie){
+        Observable.fromCallable(()->moviePresenter.getTorrent(movie))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(mv-> bgPosterDownload(mv))
+                .subscribe(mv->updateItem(mv),
+                        throwable -> errPrint(throwable));
     }
 
     private void errPrint(Throwable throwable) {

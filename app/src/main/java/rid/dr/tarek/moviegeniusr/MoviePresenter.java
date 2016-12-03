@@ -35,27 +35,32 @@ public class MoviePresenter {
     }
 
     public List<Movie> getLatestMovies() throws IOException {
-
+//TODO: redesign getLatestMovies method
         String title_fin;
         String year;
         String f_year;
+        String bURLf;
         List<String> titles = new ArrayList<String>();
         List<Movie> movies = new ArrayList<Movie>();
         List<String> years = new ArrayList<String>();
+        List<String> bURLs = new ArrayList<String>();
 
         Document movies_doc = Jsoup.connect("https://www.shaanig.org/f30/").get();
         Elements titles_els = movies_doc.getElementsByClass("threadtitle");
 
         // Convert Elements to ArrayList
         for(Element text_el: titles_els){
-            if(text_el.text().contains("1080p")){
+            if(text_el.text().contains("1080p")|text_el.text().contains("720p")){
+
                 // String manipulation and cleaning
                 year = text_el.text().split("\\(", 2)[1];
                 year = year.split("\\)",2)[0];
                 title_fin = text_el.text().split("\\(", 2)[0];
                 title_fin = title_fin.replace("Sticky:", "").trim();
+                String base_url = text_el.getElementsByAttribute("href").attr("href");
 
                 //populating titles and links to ArrayList
+                bURLs.add(base_url);
                 titles.add(title_fin);
                 years.add(year);
             }
@@ -63,8 +68,10 @@ public class MoviePresenter {
 
         for(String title:titles){
             f_year = years.get(titles.indexOf(title));
-            if(!movies.contains(new Movie(title, null, null, null, null))){
-                movies.add(new Movie(title,null,null,null,f_year));
+            bURLf = bURLs.get(titles.indexOf(title));
+            Log.d(TAG, "getLatestMovies: "+bURLf);
+            if(!movies.contains(new Movie(title, f_year, bURLf))){
+                movies.add(new Movie(title, f_year, bURLf));
             }
         }
         return movies;
@@ -194,6 +201,18 @@ public class MoviePresenter {
                 Log.d(TAG, "getBackground: "+ e.getMessage());
             }
         }
+        return n_movie;
+    }
+
+    public Movie getTorrent(Movie movie) throws IOException {
+        Movie n_movie = movie;
+        String url = Jsoup.connect(n_movie.getBaseURL()).get()
+                .getElementsByClass("downloadbutton_attachments")
+                .first()
+                .getElementsByAttribute("href")
+                .attr("href");
+        n_movie.setTorrentURL(url);
+
         return n_movie;
     }
 }
