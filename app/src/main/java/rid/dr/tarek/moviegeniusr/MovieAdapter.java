@@ -29,6 +29,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private List<Movie> myList = Collections.emptyList();
     private Context context;
     private File path;
+    private Bitmap img;
 
     public MovieAdapter(List<Movie> myList, Context context,File path) {
         this.myList = myList;
@@ -62,14 +63,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         holder.year_list_item.setText(myList.get(position).getYear());
         holder.description_list_item.setText(myList.get(position).getDescription());
 
-        if (myList.get(position).isHasPoster()){
-            Observable.fromCallable(()->getBitmap(position))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(img->{
-                        holder.poster_img_item.setImageBitmap(img);
-                    });
-        }
+//        if (myList.get(position).isHasPoster()){
+            img = getBitmap(position);
+            holder.poster_img_item.setImageBitmap(img);
+
+//        }
     }
 
     private Bitmap getBitmap(int position) {

@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                 .map(movie -> moviePresenter.getInfo(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-
                 .subscribe(mv-> bgGetTorrent(mv),
                         throwable -> errPrint(throwable));
         ss.add(s2);

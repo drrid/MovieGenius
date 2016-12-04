@@ -6,12 +6,13 @@
     android:orientation="horizontal"
     android:clickable="true"
     android:focusable="true"
-    android:background="?attr/selectableItemBackground" >
+    android:background="#FFF">
     <ImageView
         android:layout_width="100dp"
         android:layout_height="148dp"
         android:id="@+id/img_poster"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        android:background="@color/colorAccent"/>
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,18 +27,21 @@
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
             android:textSize="16sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="@color/colorTextPrimary"/>
         <TextView
             android:id="@+id/tv_item_year"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            android:textColor="@color/colorTextSecondary"/>
 
         <TextView
             android:id="@+id/tv_item_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"/>
+            android:textSize="12sp"
+            android:textColor="@color/colorTextSecondary"/>
     </LinearLayout>
 
 </LinearLayout>

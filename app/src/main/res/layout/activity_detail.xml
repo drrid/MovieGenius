@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="rid.dr.tarek.moviegeniusr.DetailActivity"
-    android:background="#f1f1f1"
+    android:background="#FFF"
     android:clipToPadding="false"
     android:clipChildren="false">
 
@@ -20,44 +20,27 @@
         android:scaleType="fitXY"
         android:outlineProvider="bounds"/>
 
-
     <TextView
         android:text="Description goes here"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/poster"
-        android:layout_alignLeft="@+id/poster"
-        android:layout_alignStart="@+id/poster"
-        android:layout_marginTop="32dp"
         android:id="@+id/d_description"
         android:fontFamily="serif"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textColor="@color/colorTextSecondary"
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:fabSize="normal"
-        app:srcCompat="@color/colorAccent"
-        android:layout_marginBottom="16dp"
-        android:id="@+id/floatingActionButton"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_add_black_24dp"
-        android:onClick="onAddBtnClick"/>
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="16dp"
+        android:layout_gravity="center|left"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
 
-        android:layout_toRightOf="@+id/poster"
-        android:layout_marginTop="200dp"
-        android:layout_marginLeft="8dp">
-
+        android:layout_marginBottom="50dp"
+        android:layout_marginRight="5dp"
+        android:layout_gravity="center">
         <TextView
             android:text="Title"
             android:layout_width="wrap_content"
@@ -65,45 +48,57 @@
             android:id="@+id/d_title"
             android:fontFamily="sans-serif-smallcaps"
             android:textSize="19sp"
-            android:textStyle="normal|bold" />
-
+            android:textStyle="normal|bold"
+            android:textColor="@color/colorTextPrimary" />
         <TextView
             android:text="Year"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/d_year"
-            android:textSize="18sp" />
-
+            android:textSize="18sp"
+            android:textColor="@color/colorTextSecondary"/>
         <TextView
             android:text="Duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/d_duration"
-            android:textSize="18sp" />
-
+            android:textSize="18sp"
+            android:textColor="@color/colorTextSecondary"/>
         <TextView
             android:text="Rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/d_rating"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@color/colorTextSecondary"/>
     </LinearLayout>
 
     <ImageView
         android:layout_width="140dp"
         android:layout_height="207dp"
         android:id="@+id/poster"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="109dp"
-        android:elevation="8dp"
+        android:elevation="4dp"
         android:background="@color/colorAccent"
         android:scaleType="fitXY"
-        android:translationZ="10dp"
-        android:clickable="true"
-        android:focusable="true"
         android:outlineProvider="bounds"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-</RelativeLayout>
+
+        android:layout_marginBottom="70dp"
+        android:layout_marginLeft="16dp"
+        android:layout_gravity="left|center"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:srcCompat="@color/colorAccent"
+        android:id="@+id/floatingActionButton"
+        android:src="@drawable/ic_add_black_24dp"
+        android:onClick="onAddBtnClick"
+
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="bottom|end"/>
+
+</FrameLayout>
