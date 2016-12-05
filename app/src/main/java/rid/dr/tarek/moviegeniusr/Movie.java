@@ -101,15 +101,17 @@ public class Movie implements Serializable{
 
         Movie movie = (Movie) o;
 
-        if (!title.equals(movie.title)) return false;
+        if (!imdbID.equals(movie.imdbID)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return title.hashCode();
+        return imdbID.hashCode();
     }
+
+
 
     public void setPosterURL(String posterURL) {
         this.posterURL = posterURL;

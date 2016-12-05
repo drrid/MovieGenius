@@ -19,6 +19,7 @@ import java.util.Timer;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -71,16 +72,23 @@ public class MainActivity extends AppCompatActivity {
                 .doOnNext(mvs -> updateItems(mvs))
                 .flatMap(mvs -> Observable.from(mvs))
                 .flatMap(mv -> moviePresenter.getInfoObs(mv))
-                .retry();
+                .filter(new Func1<Movie, Boolean>() {
+                    @Override
+                    public Boolean call(Movie movie) {
+                        return (myList.contains(movie)!=true);
+                    }
+                })
+                .retry(3);
 
         //Database data request
         Observable<Movie> dbObs = db.loadMoviesObs()
                 .doOnNext(mvs -> updateItems(mvs))
-                .flatMap(mvs -> Observable.from(mvs))
-                .retry();
+                .flatMap(mvs -> Observable.from(mvs));
 
         //data sources combined
-        Observable.concat(dbObs, netObs).subscribe(mv -> updateItem(mv),
+        Observable.concat(dbObs, netObs)
+
+                .subscribe(mv -> updateItem(mv),
                 throwable -> throwable.printStackTrace(),
                 () -> cacheMovies());
     }
