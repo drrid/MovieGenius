@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 import rx.Observable;
 import rx.Subscription;
@@ -82,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(movies -> bgInfoDownload(movies),
                         throwable -> errPrint(throwable));
         ss.add(s1);
+
+        //TEST---------------------------------------
+        List<Movie> mvs = db.loadMovies();
+        Log.d(TAG, "onBtnClick: "+mvs.get(3).getTitle());
+        //-------------------------------------------
     }
 
     //****2*****
@@ -91,13 +97,11 @@ public class MainActivity extends AppCompatActivity {
                 .map(movie -> moviePresenter.getInfo(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnCompleted(()->{
-                        pd.dismiss();
-                        cacheMovies(myList);
-                })
+                .doOnCompleted(()-> pd.dismiss())
                 .retry()
                 .subscribe(mv-> bgGetTorrent(mv),
-                        throwable -> errPrint(throwable));
+                        throwable -> errPrint(throwable),
+                        () -> cacheMovies());
         ss.add(s2);
     }
 
@@ -155,11 +159,12 @@ public class MainActivity extends AppCompatActivity {
         movieAdapter.notifyDataSetChanged();
     }
 
-    private void cacheMovies(List<Movie> movies){
+    private void cacheMovies(){
+        List<Movie> movies = myList;
         Observable.fromCallable(()->db.saveMovies(movies))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(d -> Log.d(TAG, "cacheMovies: " + d),
-                        throwable -> errPrint(throwable));
+                        throwable ->throwable.printStackTrace());
     }
 }

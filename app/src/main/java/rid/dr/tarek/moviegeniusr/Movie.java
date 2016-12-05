@@ -24,6 +24,26 @@ public class Movie implements Serializable{
     private boolean hasBackground = false;
     private String torrentURL = null;
 
+    public Movie(String b_URL, String title, String description, String subInfo,
+                 String rating, String year, String posterURL, boolean hasPoster,
+                 String pathToPoster, String imdbID, String duration,
+                 String pathToBackground, boolean hasBackground, String torrentURL) {
+        this.b_URL = b_URL;
+        this.title = title;
+        this.description = description;
+        this.subInfo = subInfo;
+        this.rating = rating;
+        this.year = year;
+        this.posterURL = posterURL;
+        this.hasPoster = hasPoster;
+        this.pathToPoster = pathToPoster;
+        this.imdbID = imdbID;
+        this.duration = duration;
+        this.pathToBackground = pathToBackground;
+        this.hasBackground = hasBackground;
+        this.torrentURL = torrentURL;
+    }
+
     public Movie(String title, String year, String b_URL) {
         this.title = title;
         this.year = year;
