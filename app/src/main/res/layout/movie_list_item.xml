@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:clickable="true"
     android:focusable="true"
-    android:background="#FFF">
+    android:background="?android:selectableItemBackground">
     <ImageView
         android:layout_width="100dp"
         android:layout_height="148dp"

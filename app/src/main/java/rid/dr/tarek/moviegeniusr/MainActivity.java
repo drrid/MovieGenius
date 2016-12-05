@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -61,12 +62,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBtnClick(View view) {
-        pd = ProgressDialog.show(this, "Loading...", "Generating 1080p movies");
+        pd = new ProgressDialog(this);
+        pd.setMessage("Loading latest movies...");
+        pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pd.setIndeterminate(false);
+        pd.setProgress(0);
+        pd.show();
+
         Subscription s1 = Observable
                 .fromCallable(()->moviePresenter.getLatestMovies())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(movies -> updateItems(movies))
+                .doOnCompleted(()->pd.setMax(myList.size()))
                 .retry()
                 .subscribe(movies -> bgInfoDownload(movies),
                         throwable -> errPrint(throwable));
@@ -79,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
                 .map(movie -> moviePresenter.getInfo(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnCompleted(()->pd.dismiss())
+                .retry()
                 .subscribe(mv-> bgGetTorrent(mv),
                         throwable -> errPrint(throwable));
         ss.add(s2);
@@ -89,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(mv-> bgPosterDownload(mv))
+                .doOnCompleted(()->pd.incrementProgressBy(1))
+                .retry()
                 .subscribe(mv->updateItem(mv),
                         throwable -> errPrint(throwable));
     }
@@ -98,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 .fromCallable(() -> moviePresenter.getPoster(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnCompleted(()->pd.dismiss())
+                .retry()
                 .subscribe(mv->updateItem(mv),
                         throwable -> errPrint(throwable));
         ss.add(s3);
@@ -109,11 +121,11 @@ public class MainActivity extends AppCompatActivity {
                 .fromCallable(() -> moviePresenter.getBackground(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .retry()
                 .subscribe(mv -> updateItem(mv),
                         throwable -> errPrint(throwable));
         ss.add(s4);
     }
-
 
     private void errPrint(Throwable throwable) {
         Log.d(TAG, "errPrint: "+ throwable);
