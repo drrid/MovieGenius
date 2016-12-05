@@ -34,7 +34,7 @@ public class Database extends SQLiteOpenHelper{
     List<Movie> movies2 = new ArrayList<Movie>();
 
     public Database(Context context) {
-        super(context, "movies3.db", null, 1);
+        super(context, "movies7.db", null, 1);
     }
 
     @Override

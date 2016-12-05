@@ -60,16 +60,22 @@ public class MainActivity extends AppCompatActivity {
         moviesListRV.addItemDecoration(dividerItemDecoration);
 
         //ProgressDialog
-//        pd = new ProgressDialog(this);
-//        pd.setMessage("Loading latest movies...");
-//        pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//        pd.setIndeterminate(false);
-//        pd.setProgress(0);
-//        pd.show();
+        pd = new ProgressDialog(this);
+        pd.setMessage("Loading latest movies...");
+        pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pd.setIndeterminate(false);
+        pd.setProgress(0);
+        pd.show();
 
         //Network data request
         Observable<Movie> netObs = moviePresenter.getLMObs()
-                .doOnNext(mvs -> updateItems(mvs))
+                .filter(new Func1<List<Movie>, Boolean>() {
+                    @Override
+                    public Boolean call(List<Movie> movies) {
+                        return myList.isEmpty();
+                    }
+                })
+                .doOnNext(movies -> updateItems(movies))
                 .flatMap(mvs -> Observable.from(mvs))
                 .flatMap(mv -> moviePresenter.getInfoObs(mv))
                 .filter(new Func1<Movie, Boolean>() {
@@ -78,23 +84,25 @@ public class MainActivity extends AppCompatActivity {
                         return (myList.contains(movie)!=true);
                     }
                 })
-                .retry(3);
+                .retry(5);
 
         //Database data request
         Observable<Movie> dbObs = db.loadMoviesObs()
-                .doOnNext(mvs -> updateItems(mvs))
-                .flatMap(mvs -> Observable.from(mvs));
+                .doOnNext(movies -> updateItems(movies))
+                .doOnCompleted(()-> pd.dismiss())
+                .flatMap(mvs -> Observable.from(mvs))
+                .doOnNext(movie -> movie.setYear("database"));
 
         //data sources combined
-        Observable.concat(dbObs, netObs)
-
-                .subscribe(mv -> updateItem(mv),
-                throwable -> throwable.printStackTrace(),
-                () -> cacheMovies());
+        Observable.merge(dbObs, netObs)
+                .doOnEach(movie -> pd.incrementProgressBy(1))
+                .subscribe(
+                        mv -> updateItem(mv),
+                        throwable -> throwable.printStackTrace(),
+                        () -> cacheMovies());
     }
 
     private void updateItem(Movie movie) {
-        Log.d(TAG, "updateItem: " + movie.getTitle());
         int i = myList.indexOf(movie);
         myList.remove(movie);
         myList.add(i, movie);
@@ -102,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateItems(List<Movie> movies) {
+        pd.setMax(movies.size());
         myList.clear();
         myList.addAll(movies);
         movieAdapter.notifyDataSetChanged();

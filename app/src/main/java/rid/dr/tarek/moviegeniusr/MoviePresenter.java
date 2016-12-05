@@ -78,7 +78,6 @@ public class MoviePresenter {
         for(String title:titles){
             f_year = years.get(titles.indexOf(title));
             bURLf = bURLs.get(titles.indexOf(title));
-            Log.d(TAG, "getLatestMovies: "+bURLf);
             if(!movies.contains(new Movie(title, f_year, bURLf))){
                 movies.add(new Movie(title, f_year, bURLf));
             }
