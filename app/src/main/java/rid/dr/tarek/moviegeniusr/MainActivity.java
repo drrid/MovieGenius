@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private CompositeSubscription ss = new CompositeSubscription();
     private static final String TAG = "DRRID";
 
-    //TODO: create observable for items and subscribe to it from detailActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
         moviePresenter.setPath(path);
 
-        //TODO: cach movies so when I enter the app I see the last downloaded info
 
         // init RecyclerView
         moviesListRV = (RecyclerView)findViewById(R.id.rv_movies);
@@ -63,95 +61,31 @@ public class MainActivity extends AppCompatActivity {
         moviesListRV.addItemDecoration(dividerItemDecoration);
     }
 
-//*****************************************************************************************
-    //****1*****
     public void onBtnClick(View view) {
         pd = new ProgressDialog(this);
         pd.setMessage("Loading latest movies...");
         pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         pd.setIndeterminate(false);
         pd.setProgress(0);
-        pd.show();
+//        pd.show();
 
-        Subscription s1 = Observable
-                .fromCallable(()->moviePresenter.getLatestMovies())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(movies -> updateItems(movies))
-                .doOnCompleted(()->pd.setMax(myList.size()))
-                .retry()
-                .subscribe(movies -> bgGetAll(movies),
-                        throwable -> errPrint(throwable));
-        ss.add(s1);
-    }
+        Observable<Movie> netObs = moviePresenter.getLMObs()
+                .doOnNext(mvs -> updateItems(mvs))
+                .flatMap(mvs -> Observable.from(mvs))
+                .flatMap(mv -> moviePresenter.getInfoObs(mv));
 
-    private void bgGetAll(List<Movie> movies){
-        for(Movie movie:movies){
-            moviePresenter.getInfoObs(movie)
-                    .doOnNext((m)->pd.incrementProgressBy(1))
-                    .subscribe(
-                            mv->updateItem(mv),
-                            throwable -> throwable.printStackTrace());
-        }
-        pd.dismiss();
-    }
-    //****2*****
-    private void bgInfoDownload(List<Movie> movies){
-        Subscription s2 = Observable
-                .from(movies)
-                .map(movie -> moviePresenter.getInfo(movie))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnCompleted(()-> pd.dismiss())
-                .retry()
-                .subscribe(mv-> bgGetTorrent(mv),
-                        throwable -> errPrint(throwable),
-                        () -> cacheMovies());
-        ss.add(s2);
+        Observable<Movie> dbObs = db.loadMoviesObs()
+                .doOnNext(mvs -> updateItems(mvs))
+                .flatMap(mvs -> Observable.from(mvs));
+
+        Observable.merge(dbObs, netObs).subscribe(mv -> updateItem(mv),
+                throwable -> throwable.printStackTrace(),
+                () -> cacheMovies());
     }
 
-    //****3*****
-    private void bgGetTorrent(Movie movie){
-        Observable.fromCallable(()->moviePresenter.getTorrent(movie))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(mv-> bgPosterDownload(mv))
-                .doOnCompleted(()->pd.incrementProgressBy(1))
-                .retry()
-                .subscribe(mv->updateItem(mv),
-                        throwable -> errPrint(throwable));
-    }
-
-    //****4*****
-    private void bgPosterDownload(Movie movie){
-        Subscription s3 = Observable
-                .fromCallable(() -> moviePresenter.getPoster(movie))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry()
-                .subscribe(mv->updateItem(mv),
-                        throwable -> errPrint(throwable));
-        ss.add(s3);
-    }
-
-    //****5*****
-    private void bgThumbDownload(Movie movie){
-        Subscription s4 = Observable
-                .fromCallable(() -> moviePresenter.getBackground(movie))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retry()
-                .subscribe(mv -> updateItem(mv),
-                        throwable -> errPrint(throwable));
-        ss.add(s4);
-    }
-//*****************************************************************************************
-
-    private void errPrint(Throwable throwable) {
-        Log.d(TAG, "errPrint: "+ throwable);
-    }
 
     private void updateItem(Movie movie) {
+        Log.d(TAG, "updateItem: " + movie.getTitle());
         int i = myList.indexOf(movie);
         myList.remove(movie);
         myList.add(i, movie);

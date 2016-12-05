@@ -9,6 +9,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 public class Database extends SQLiteOpenHelper{
 
     private static final String MOVIES_TABLE = "movies";
@@ -113,5 +117,11 @@ public class Database extends SQLiteOpenHelper{
 
         db.close();
         return movies;
+    }
+
+    public Observable<List<Movie>> loadMoviesObs(){
+        return Observable.defer(()->Observable.just(loadMovies()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }

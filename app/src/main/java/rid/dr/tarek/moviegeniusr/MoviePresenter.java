@@ -38,7 +38,7 @@ public class MoviePresenter {
         this.path = path;
     }
 
-    public List<Movie> getLatestMovies() throws IOException {
+    public List<Movie> getLatestMovies(){
 //TODO: redesign getLatestMovies method
         String title_fin;
         String year;
@@ -49,7 +49,12 @@ public class MoviePresenter {
         List<String> years = new ArrayList<String>();
         List<String> bURLs = new ArrayList<String>();
 
-        Document movies_doc = Jsoup.connect("https://www.shaanig.org/f30/").get();
+        Document movies_doc = null;
+        try {
+            movies_doc = Jsoup.connect("https://www.shaanig.org/f30/").get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Elements titles_els = movies_doc.getElementsByClass("threadtitle");
 
         // Convert Elements to ArrayList
@@ -236,16 +241,10 @@ public class MoviePresenter {
         return ob;
     }
 
-//    public Observable<Movie> getInfoObs(Movie movie){
-//        return Observable.defer(()->Observable.just(getInfo(movie)));
-//    }
-//    public Observable<Movie> getPosterObs(Movie movie){
-//        return Observable.defer(()->Observable.just(getPoster(movie)));
-//    }
-//    public Observable<Movie> getBGObs(Movie movie){
-//        return Observable.defer(()->Observable.just(getBackground(movie)));
-//    }
-//    public Observable<Movie> getTorrentObs(Movie movie){
-//        return Observable.defer(()->Observable.just(getTorrent(movie)));
-//    }
+    public Observable<List<Movie>> getLMObs(){
+        return Observable.defer(()->Observable.just(getLatestMovies()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
 }
