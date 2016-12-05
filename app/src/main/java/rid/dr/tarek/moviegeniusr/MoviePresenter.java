@@ -19,6 +19,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 /**
  * Created by Tarek on 11/29/2016.
  */
@@ -204,15 +208,44 @@ public class MoviePresenter {
         return n_movie;
     }
 
-    public Movie getTorrent(Movie movie) throws IOException {
+    public Movie getTorrent(Movie movie) {
         Movie n_movie = movie;
-        String url = Jsoup.connect(n_movie.getBaseURL()).get()
-                .getElementsByClass("downloadbutton_attachments")
-                .first()
-                .getElementsByAttribute("href")
-                .attr("href");
+        String url = null;
+        try {
+            url = Jsoup.connect(n_movie.getBaseURL()).get()
+                    .getElementsByClass("downloadbutton_attachments")
+                    .first()
+                    .getElementsByAttribute("href")
+                    .attr("href");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         n_movie.setTorrentURL(url);
 
         return n_movie;
     }
+
+    public Observable<Movie> getInfoObs(Movie movie){
+        Observable ob = Observable.merge(
+                    Observable.defer(()->Observable.just(getInfo(movie))),
+                    Observable.defer(()->Observable.just(getPoster(movie))),
+                    Observable.defer(()->Observable.just(getTorrent(movie))))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        return ob;
+    }
+
+//    public Observable<Movie> getInfoObs(Movie movie){
+//        return Observable.defer(()->Observable.just(getInfo(movie)));
+//    }
+//    public Observable<Movie> getPosterObs(Movie movie){
+//        return Observable.defer(()->Observable.just(getPoster(movie)));
+//    }
+//    public Observable<Movie> getBGObs(Movie movie){
+//        return Observable.defer(()->Observable.just(getBackground(movie)));
+//    }
+//    public Observable<Movie> getTorrentObs(Movie movie){
+//        return Observable.defer(()->Observable.just(getTorrent(movie)));
+//    }
 }

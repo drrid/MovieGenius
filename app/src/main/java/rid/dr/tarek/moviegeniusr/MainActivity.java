@@ -80,16 +80,21 @@ public class MainActivity extends AppCompatActivity {
                 .doOnNext(movies -> updateItems(movies))
                 .doOnCompleted(()->pd.setMax(myList.size()))
                 .retry()
-                .subscribe(movies -> bgInfoDownload(movies),
+                .subscribe(movies -> bgGetAll(movies),
                         throwable -> errPrint(throwable));
         ss.add(s1);
-
-        //TEST---------------------------------------
-        List<Movie> mvs = db.loadMovies();
-        Log.d(TAG, "onBtnClick: "+mvs.get(3).getTitle());
-        //-------------------------------------------
     }
 
+    private void bgGetAll(List<Movie> movies){
+        for(Movie movie:movies){
+            moviePresenter.getInfoObs(movie)
+                    .doOnNext((m)->pd.incrementProgressBy(1))
+                    .subscribe(
+                            mv->updateItem(mv),
+                            throwable -> throwable.printStackTrace());
+        }
+        pd.dismiss();
+    }
     //****2*****
     private void bgInfoDownload(List<Movie> movies){
         Subscription s2 = Observable
