@@ -23,6 +23,7 @@ import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Database db = new Database(this);
     private RecyclerView moviesListRV;
     private MovieAdapter movieAdapter;
     private List<Movie> myList = new ArrayList<Movie>();
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         moviesListRV.addItemDecoration(dividerItemDecoration);
     }
 
+//*****************************************************************************************
+    //****1*****
     public void onBtnClick(View view) {
         pd = new ProgressDialog(this);
         pd.setMessage("Loading latest movies...");
@@ -81,19 +84,24 @@ public class MainActivity extends AppCompatActivity {
         ss.add(s1);
     }
 
+    //****2*****
     private void bgInfoDownload(List<Movie> movies){
         Subscription s2 = Observable
                 .from(movies)
                 .map(movie -> moviePresenter.getInfo(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnCompleted(()->pd.dismiss())
+                .doOnCompleted(()->{
+                        pd.dismiss();
+                        cacheMovies(myList);
+                })
                 .retry()
                 .subscribe(mv-> bgGetTorrent(mv),
                         throwable -> errPrint(throwable));
         ss.add(s2);
     }
 
+    //****3*****
     private void bgGetTorrent(Movie movie){
         Observable.fromCallable(()->moviePresenter.getTorrent(movie))
                 .subscribeOn(Schedulers.io())
@@ -105,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                         throwable -> errPrint(throwable));
     }
 
+    //****4*****
     private void bgPosterDownload(Movie movie){
         Subscription s3 = Observable
                 .fromCallable(() -> moviePresenter.getPoster(movie))
@@ -116,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         ss.add(s3);
     }
 
+    //****5*****
     private void bgThumbDownload(Movie movie){
         Subscription s4 = Observable
                 .fromCallable(() -> moviePresenter.getBackground(movie))
@@ -126,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                         throwable -> errPrint(throwable));
         ss.add(s4);
     }
+//*****************************************************************************************
 
     private void errPrint(Throwable throwable) {
         Log.d(TAG, "errPrint: "+ throwable);
@@ -142,5 +153,13 @@ public class MainActivity extends AppCompatActivity {
         myList.clear();
         myList.addAll(movies);
         movieAdapter.notifyDataSetChanged();
+    }
+
+    private void cacheMovies(List<Movie> movies){
+        Observable.fromCallable(()->db.saveMovies(movies))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(d -> Log.d(TAG, "cacheMovies: " + d),
+                        throwable -> errPrint(throwable));
     }
 }
