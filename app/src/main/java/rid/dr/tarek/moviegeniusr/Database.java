@@ -53,7 +53,6 @@ public class Database extends SQLiteOpenHelper{
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 
     public String saveMovies(List<Movie> movies){
@@ -84,7 +83,6 @@ public class Database extends SQLiteOpenHelper{
         db.close();
         return "done";
     }
-
 
     public List<Movie> loadMovies(){
         List<Movie> movies = new ArrayList<Movie>();

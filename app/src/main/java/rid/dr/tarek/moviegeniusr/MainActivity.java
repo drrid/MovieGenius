@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private MoviePresenter moviePresenter;
     private ProgressDialog pd;
     private File path;
-    private CompositeSubscription ss = new CompositeSubscription();
     private static final String TAG = "DRRID";
 
 
@@ -49,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
         moviePresenter.setPath(path);
 
-
         // init RecyclerView
         moviesListRV = (RecyclerView)findViewById(R.id.rv_movies);
         movieAdapter = new MovieAdapter(myList, getApplication(), path);
@@ -59,30 +57,33 @@ public class MainActivity extends AppCompatActivity {
         DividerItemDecoration dividerItemDecoration =
                 new DividerItemDecoration(moviesListRV.getContext(),1);
         moviesListRV.addItemDecoration(dividerItemDecoration);
-    }
 
-    public void onBtnClick(View view) {
-        pd = new ProgressDialog(this);
-        pd.setMessage("Loading latest movies...");
-        pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        pd.setIndeterminate(false);
-        pd.setProgress(0);
+        //ProgressDialog
+//        pd = new ProgressDialog(this);
+//        pd.setMessage("Loading latest movies...");
+//        pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//        pd.setIndeterminate(false);
+//        pd.setProgress(0);
 //        pd.show();
 
+        //Network data request
         Observable<Movie> netObs = moviePresenter.getLMObs()
                 .doOnNext(mvs -> updateItems(mvs))
                 .flatMap(mvs -> Observable.from(mvs))
-                .flatMap(mv -> moviePresenter.getInfoObs(mv));
+                .flatMap(mv -> moviePresenter.getInfoObs(mv))
+                .retry();
 
+        //Database data request
         Observable<Movie> dbObs = db.loadMoviesObs()
                 .doOnNext(mvs -> updateItems(mvs))
-                .flatMap(mvs -> Observable.from(mvs));
+                .flatMap(mvs -> Observable.from(mvs))
+                .retry();
 
-        Observable.merge(dbObs, netObs).subscribe(mv -> updateItem(mv),
+        //data sources combined
+        Observable.concat(dbObs, netObs).subscribe(mv -> updateItem(mv),
                 throwable -> throwable.printStackTrace(),
                 () -> cacheMovies());
     }
-
 
     private void updateItem(Movie movie) {
         Log.d(TAG, "updateItem: " + movie.getTitle());
