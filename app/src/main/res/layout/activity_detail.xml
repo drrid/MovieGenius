@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_detail"
@@ -11,81 +11,130 @@
     android:clipChildren="false">
 
     <ImageView
-        android:layout_width="match_parent"
+        android:layout_width="411dp"
         android:layout_height="190dp"
         app:srcCompat="@color/colorPrimary"
         android:id="@+id/background"
         android:elevation="4dp"
         android:background="@color/colorPrimary"
         android:scaleType="fitXY"
-        android:outlineProvider="bounds"/>
+        android:outlineProvider="bounds"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:text="Description goes here"
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
         android:id="@+id/d_description"
         android:fontFamily="serif"
         android:textSize="16sp"
         android:textColor="@color/colorTextSecondary"
 
-        android:layout_marginTop="80dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginLeft="16dp"
-        android:layout_gravity="center|left"/>
+        app:layout_constraintTop_toBottomOf="@+id/poster"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintVertical_bias="0.100000024"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="16dp"
+        app:layout_constraintHorizontal_bias="0.0" />
 
-    <LinearLayout
+
+    <TextView
+        android:text="Title"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:id="@+id/d_title"
+        android:fontFamily="sans-serif-smallcaps"
+        android:textSize="19sp"
+        android:textStyle="normal|bold"
+        android:textColor="@color/colorTextPrimary"
+        app:layout_constraintLeft_toRightOf="@+id/poster"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/background"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="16dp"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <TextView
+        android:text="Year"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:id="@+id/d_year"
+        android:textSize="18sp"
+        android:textColor="@color/colorTextSecondary"
+        tools:layout_conversion_absoluteX="166dp"
+        tools:layout_conversion_absoluteY="230dp"
+        tools:layout_conversion_absoluteWidth="36dp"
+        tools:layout_conversion_absoluteHeight="21dp"
+        app:layout_constraintTop_toBottomOf="@+id/d_title"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/poster"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintHorizontal_bias="0.03"
+        android:layout_marginTop="8dp" />
 
-        android:layout_marginBottom="50dp"
-        android:layout_marginRight="5dp"
-        android:layout_gravity="center">
-        <TextView
-            android:text="Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/d_title"
-            android:fontFamily="sans-serif-smallcaps"
-            android:textSize="19sp"
-            android:textStyle="normal|bold"
-            android:textColor="@color/colorTextPrimary" />
-        <TextView
-            android:text="Year"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/d_year"
-            android:textSize="18sp"
-            android:textColor="@color/colorTextSecondary"/>
-        <TextView
-            android:text="Duration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/d_duration"
-            android:textSize="18sp"
-            android:textColor="@color/colorTextSecondary"/>
-        <TextView
-            android:text="Rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/d_rating"
-            android:textSize="18sp"
-            android:textColor="@color/colorTextSecondary"/>
-    </LinearLayout>
+    <TextView
+        android:text="Duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/d_duration"
+        android:textSize="18sp"
+        android:textColor="@color/colorTextSecondary"
+        tools:layout_conversion_absoluteX="166dp"
+        tools:layout_conversion_absoluteY="252dp"
+        tools:layout_conversion_absoluteWidth="68dp"
+        tools:layout_conversion_absoluteHeight="21dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/poster"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/d_year"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:text="Rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/d_rating"
+        android:textSize="18sp"
+        android:textColor="@color/colorTextSecondary"
+        tools:layout_conversion_absoluteX="166dp"
+        tools:layout_conversion_absoluteY="273dp"
+        tools:layout_conversion_absoluteWidth="51dp"
+        tools:layout_conversion_absoluteHeight="21dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/poster"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/d_duration"
+        android:layout_marginTop="8dp" />
+
 
     <ImageView
-        android:layout_width="140dp"
-        android:layout_height="207dp"
+        android:layout_width="150dp"
+        android:layout_height="237dp"
         android:id="@+id/poster"
         android:elevation="4dp"
         android:background="@color/colorAccent"
         android:scaleType="fitXY"
         android:outlineProvider="bounds"
 
-        android:layout_marginBottom="70dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginLeft="16dp"
-        android:layout_gravity="left|center"
-        />
+        app:layout_constraintTop_toTopOf="@+id/background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintVertical_bias="0.32999998" />
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
@@ -97,8 +146,10 @@
         android:src="@drawable/ic_add_black_24dp"
         android:onClick="onAddBtnClick"
 
-        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
         android:layout_marginRight="16dp"
-        android:layout_gravity="bottom|end"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp" />
 
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>

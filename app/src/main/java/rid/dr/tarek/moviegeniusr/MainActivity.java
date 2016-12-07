@@ -1,6 +1,5 @@
 package rid.dr.tarek.moviegeniusr;
 
-import android.app.ProgressDialog;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,22 +7,17 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private MovieAdapter movieAdapter;
     private List<Movie> myList = new ArrayList<Movie>();
     private MoviePresenter moviePresenter;
-    private ProgressDialog pd;
+    private ProgressBar pb;
     private File path;
     private static final String TAG = "DRRID";
 
@@ -61,17 +55,12 @@ public class MainActivity extends AppCompatActivity {
                 new DividerItemDecoration(moviesListRV.getContext(), 1);
         moviesListRV.addItemDecoration(dividerItemDecoration);
 
-        //ProgressDialog
-        pd = new ProgressDialog(this);
-        pd.setMessage("Loading latest movies...");
-        pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        pd.setIndeterminate(false);
-        pd.setProgress(0);
-//        pd.show();
+        //ProgressBar
+        pb = (ProgressBar) findViewById(R.id.progressBar);
 
         //Network data request
         Observable<Movie> netObs = moviePresenter.getLMObs()
-                .doOnNext(mvs -> pd.setMax(mvs.size()))
+                .doOnNext(mvs -> pb.setMax(mvs.size()))
                 .flatMap(mvs -> Observable.from(mvs))
                 .filter(new Func1<Movie, Boolean>() {
                     @Override
@@ -80,10 +69,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .flatMap(mv -> moviePresenter.getInfoObs(mv))
-                .retry(3)
+                .retry(10)
                 .delay(500, TimeUnit.MILLISECONDS)
                 .doOnCompleted(() -> cacheMovies());
-
 
         //Database data request
         Observable<Movie> dbObs = db.loadMoviesObs()
@@ -99,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         Observable.concat(dbObs, netObs)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnEach((mv) -> pb.incrementProgressBy(1))
                 .subscribe(
                         mv -> updateItem(mv),
                         throwable -> throwable.printStackTrace());
