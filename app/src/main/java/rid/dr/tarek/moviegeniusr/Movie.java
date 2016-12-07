@@ -12,7 +12,7 @@ public class Movie implements Serializable{
     private String b_URL = null;
     private String title = null;
     private String description = null;
-    private String subInfo = null;
+    private String subInfo = "subinfo";
     private String rating = null;
     private String year = null;
     private String posterURL = null;
@@ -23,6 +23,7 @@ public class Movie implements Serializable{
     private String pathToBackground = null;
     private boolean hasBackground = false;
     private String torrentURL = null;
+    private String source = null;
 
     public Movie(String b_URL, String title, String description, String subInfo,
                  String rating, String year, String posterURL, boolean hasPoster,
@@ -101,47 +102,14 @@ public class Movie implements Serializable{
 
         Movie movie = (Movie) o;
 
-        if (hasPoster != movie.hasPoster) return false;
-        if (hasBackground != movie.hasBackground) return false;
-        if (b_URL != null ? !b_URL.equals(movie.b_URL) : movie.b_URL != null) return false;
-        if (!title.equals(movie.title)) return false;
-        if (description != null ? !description.equals(movie.description) : movie.description != null)
-            return false;
-        if (subInfo != null ? !subInfo.equals(movie.subInfo) : movie.subInfo != null) return false;
-        if (rating != null ? !rating.equals(movie.rating) : movie.rating != null) return false;
-        if (!year.equals(movie.year)) return false;
-        if (posterURL != null ? !posterURL.equals(movie.posterURL) : movie.posterURL != null)
-            return false;
-        if (pathToPoster != null ? !pathToPoster.equals(movie.pathToPoster) : movie.pathToPoster != null)
-            return false;
-        if (imdbID != null ? !imdbID.equals(movie.imdbID) : movie.imdbID != null) return false;
-        if (duration != null ? !duration.equals(movie.duration) : movie.duration != null)
-            return false;
-        if (pathToBackground != null ? !pathToBackground.equals(movie.pathToBackground) : movie.pathToBackground != null)
-            return false;
-        if (torrentURL != null ? !torrentURL.equals(movie.torrentURL) : movie.torrentURL != null)
-            return false;
+        if (!getTitle().equals(movie.getTitle())) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = b_URL != null ? b_URL.hashCode() : 0;
-        result = 31 * result + title.hashCode();
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (subInfo != null ? subInfo.hashCode() : 0);
-        result = 31 * result + (rating != null ? rating.hashCode() : 0);
-        result = 31 * result + year.hashCode();
-        result = 31 * result + (posterURL != null ? posterURL.hashCode() : 0);
-        result = 31 * result + (hasPoster ? 1 : 0);
-        result = 31 * result + (pathToPoster != null ? pathToPoster.hashCode() : 0);
-        result = 31 * result + (imdbID != null ? imdbID.hashCode() : 0);
-        result = 31 * result + (duration != null ? duration.hashCode() : 0);
-        result = 31 * result + (pathToBackground != null ? pathToBackground.hashCode() : 0);
-        result = 31 * result + (hasBackground ? 1 : 0);
-        result = 31 * result + (torrentURL != null ? torrentURL.hashCode() : 0);
-        return result;
+        return getTitle().hashCode();
     }
 
     public void setPosterURL(String posterURL) {
@@ -202,5 +170,13 @@ public class Movie implements Serializable{
 
     public String getTorrentURL() {
         return torrentURL;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }

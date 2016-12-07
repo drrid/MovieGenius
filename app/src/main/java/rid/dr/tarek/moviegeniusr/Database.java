@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class Database extends SQLiteOpenHelper{
+    private static final String TAG = "DRRID";
 
     private static final String MOVIES_TABLE = "movies";
     private static final String COL_ID = "imdbID";
@@ -31,10 +33,11 @@ public class Database extends SQLiteOpenHelper{
     private static final String COL_PATHTOPOSTER = "pToPoster";
     private static final String COL_PATHTOBACKGROUND = "pToBG";
     private static final String COL_TORRENTURL = "tURL";
+
     List<Movie> movies2 = new ArrayList<Movie>();
 
     public Database(Context context) {
-        super(context, "movies7.db", null, 1);
+        super(context, "movies13.db", null, 1);
     }
 
     @Override
@@ -78,7 +81,10 @@ public class Database extends SQLiteOpenHelper{
             cv.put(COL_PATHTOBACKGROUND, movie.getPathToBackground());
             cv.put(COL_TORRENTURL, movie.getTorrentURL());
 
+
             db.insert(MOVIES_TABLE, null, cv);
+
+
         }
         db.close();
         return "done";
@@ -86,6 +92,7 @@ public class Database extends SQLiteOpenHelper{
 
     public List<Movie> loadMovies(){
         List<Movie> movies = new ArrayList<Movie>();
+
         SQLiteDatabase db = getReadableDatabase();
         String sql = String.format("SELECT * FROM %s", MOVIES_TABLE);
         Cursor cursor = db.rawQuery(sql, null);
@@ -111,15 +118,13 @@ public class Database extends SQLiteOpenHelper{
                     posterURL, hPoster, pathToPoster, imdbID, duration, pathToBG, hBG, torrentURL);
 
             movies.add(movie);
-        }
 
         db.close();
+    }
         return movies;
     }
 
     public Observable<List<Movie>> loadMoviesObs(){
-        return Observable.defer(()->Observable.just(loadMovies()))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return Observable.defer(()->Observable.just(loadMovies()));
     }
 }

@@ -233,17 +233,13 @@ public class MoviePresenter {
         Observable ob = Observable.merge(
                     Observable.defer(()->Observable.just(getInfo(movie))),
                     Observable.defer(()->Observable.just(getPoster(movie))),
-                    Observable.defer(()->Observable.just(getTorrent(movie))))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                    Observable.defer(()->Observable.just(getTorrent(movie))));
 
         return ob;
     }
 
     public Observable<List<Movie>> getLMObs(){
-        return Observable.defer(()->Observable.just(getLatestMovies()))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return Observable.defer(()->Observable.just(getLatestMovies()));
     }
 
 }
