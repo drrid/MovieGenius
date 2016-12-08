@@ -14,7 +14,7 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class Database extends SQLiteOpenHelper{
+public class Database extends SQLiteOpenHelper {
     private static final String TAG = "DRRID";
 
     private static final String MOVIES_TABLE = "movies";
@@ -43,13 +43,13 @@ public class Database extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sql = String.format("CREATE TABLE %s (%s TEXT PRIMARY KEY" +
-                    ", %s TEXT, %s TEXT," +
-                    "%s TEXT, %s TEXT, %s TEXT, " +
-                    "%s BOOLEAN, %s BOOLEAN, %s TEXT, %s TEXT," +
-                    " %s TEXT, %s TEXT, %s TEXT, %s TEXT)", MOVIES_TABLE, COL_ID, COL_TITLE
-                    , COL_YEAR, COL_INFO, COL_RATING, COL_DURATION, COL_H_POSTER, COL_H_BG,
-                    COL_B_URL, COL_SUBINFO, COL_POSTERURL, COL_PATHTOPOSTER,
-                    COL_PATHTOBACKGROUND, COL_TORRENTURL);
+                        ", %s TEXT, %s TEXT," +
+                        "%s TEXT, %s TEXT, %s TEXT, " +
+                        "%s BOOLEAN, %s BOOLEAN, %s TEXT, %s TEXT," +
+                        " %s TEXT, %s TEXT, %s TEXT, %s TEXT)", MOVIES_TABLE, COL_ID, COL_TITLE
+                , COL_YEAR, COL_INFO, COL_RATING, COL_DURATION, COL_H_POSTER, COL_H_BG,
+                COL_B_URL, COL_SUBINFO, COL_POSTERURL, COL_PATHTOPOSTER,
+                COL_PATHTOBACKGROUND, COL_TORRENTURL);
 
         db.execSQL(sql);
     }
@@ -58,12 +58,12 @@ public class Database extends SQLiteOpenHelper{
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
-    public String saveMovies(List<Movie> movies){
+    public String saveMovies(List<Movie> movies) {
         movies2.addAll(movies);
         SQLiteDatabase db = getWritableDatabase();
         db.delete(MOVIES_TABLE, null, null);
 
-        for(Movie movie:movies2){
+        for (Movie movie : movies2) {
             ContentValues cv = new ContentValues();
             cv.put(COL_ID, movie.getImdbID());
             cv.put(COL_TITLE, movie.getTitle());
@@ -81,31 +81,28 @@ public class Database extends SQLiteOpenHelper{
             cv.put(COL_PATHTOBACKGROUND, movie.getPathToBackground());
             cv.put(COL_TORRENTURL, movie.getTorrentURL());
 
-
             db.insert(MOVIES_TABLE, null, cv);
-
-
         }
         db.close();
         return "done";
     }
 
-    public List<Movie> loadMovies(){
+    public List<Movie> loadMovies() {
         List<Movie> movies = new ArrayList<Movie>();
 
         SQLiteDatabase db = getReadableDatabase();
         String sql = String.format("SELECT * FROM %s", MOVIES_TABLE);
         Cursor cursor = db.rawQuery(sql, null);
 
-        while(cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             String imdbID = cursor.getString(0);
             String title = cursor.getString(1);
             String year = cursor.getString(2);
             String description = cursor.getString(3);
             String rating = cursor.getString(4);
             String duration = cursor.getString(5);
-            boolean hPoster = cursor.getInt(6)!=0;
-            boolean hBG = cursor.getInt(7)!=0;
+            boolean hPoster = cursor.getInt(6) != 0;
+            boolean hBG = cursor.getInt(7) != 0;
 
             String bURL = cursor.getString(8);
             String subinfo = cursor.getString(9);
@@ -118,13 +115,12 @@ public class Database extends SQLiteOpenHelper{
                     posterURL, hPoster, pathToPoster, imdbID, duration, pathToBG, hBG, torrentURL);
 
             movies.add(movie);
-
-        db.close();
-    }
+            db.close();
+        }
         return movies;
     }
 
-    public Observable<List<Movie>> loadMoviesObs(){
-        return Observable.defer(()->Observable.just(loadMovies()));
+    public Observable<List<Movie>> loadMoviesObs() {
+        return Observable.defer(() -> Observable.just(loadMovies()));
     }
 }

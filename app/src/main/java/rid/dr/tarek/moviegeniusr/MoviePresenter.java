@@ -241,5 +241,4 @@ public class MoviePresenter {
     public Observable<List<Movie>> getLMObs(){
         return Observable.defer(()->Observable.just(getLatestMovies()));
     }
-
 }

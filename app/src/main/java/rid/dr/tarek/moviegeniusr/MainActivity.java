@@ -62,12 +62,7 @@ public class MainActivity extends AppCompatActivity {
         Observable<Movie> netObs = moviePresenter.getLMObs()
                 .doOnNext(mvs -> pb.setMax(mvs.size()))
                 .flatMap(mvs -> Observable.from(mvs))
-                .filter(new Func1<Movie, Boolean>() {
-                    @Override
-                    public Boolean call(Movie movie) {
-                        return (myList.contains(movie) == false);
-                    }
-                })
+                .filter(movie -> (myList.contains(movie) == false))
                 .flatMap(mv -> moviePresenter.getInfoObs(mv))
                 .retry(10)
                 .delay(500, TimeUnit.MILLISECONDS)
@@ -75,12 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Database data request
         Observable<Movie> dbObs = db.loadMoviesObs()
-                .filter(new Func1<List<Movie>, Boolean>() {
-                    @Override
-                    public Boolean call(List<Movie> movies) {
-                        return (movies != null);
-                    }
-                })
+                .filter(movies -> (movies!=null))
                 .flatMap(mvs -> Observable.from(mvs));
 
         //data sources combined
