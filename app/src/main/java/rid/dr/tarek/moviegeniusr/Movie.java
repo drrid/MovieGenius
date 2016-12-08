@@ -12,7 +12,7 @@ public class Movie implements Serializable{
     private String b_URL = null;
     private String title = null;
     private String description = null;
-    private String subInfo = "subinfo";
+    private String subInfo = null;
     private String rating = null;
     private String year = null;
     private String posterURL = null;
@@ -24,11 +24,12 @@ public class Movie implements Serializable{
     private boolean hasBackground = false;
     private String torrentURL = null;
     private String source = null;
+    private String genre = null;
 
     public Movie(String b_URL, String title, String description, String subInfo,
                  String rating, String year, String posterURL, boolean hasPoster,
                  String pathToPoster, String imdbID, String duration,
-                 String pathToBackground, boolean hasBackground, String torrentURL) {
+                 String pathToBackground, boolean hasBackground, String torrentURL, String genre) {
         this.b_URL = b_URL;
         this.title = title;
         this.description = description;
@@ -43,6 +44,7 @@ public class Movie implements Serializable{
         this.pathToBackground = pathToBackground;
         this.hasBackground = hasBackground;
         this.torrentURL = torrentURL;
+        this.genre = genre;
     }
 
     public Movie(String title, String year, String b_URL) {
@@ -178,5 +180,13 @@ public class Movie implements Serializable{
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public String getGenre() {
+        return genre;
     }
 }

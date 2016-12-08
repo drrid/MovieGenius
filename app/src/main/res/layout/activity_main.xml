@@ -15,8 +15,7 @@
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:id="@+id/progressBar"
         android:background="#fff"
-        android:foreground="@color/colorAccent"
-        />
+        android:foreground="@color/colorAccent" />
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

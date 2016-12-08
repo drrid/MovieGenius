@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
@@ -64,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 .flatMap(mvs -> Observable.from(mvs))
                 .filter(movie -> (myList.contains(movie) == false))
                 .flatMap(mv -> moviePresenter.getInfoObs(mv))
+                .doOnNext(mv -> mv.setSource("Network"))
                 .retry(10)
                 .delay(500, TimeUnit.MILLISECONDS)
                 .doOnCompleted(() -> cacheMovies());
@@ -71,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
         //Database data request
         Observable<Movie> dbObs = db.loadMoviesObs()
                 .filter(movies -> (movies!=null))
-                .flatMap(mvs -> Observable.from(mvs));
+                .flatMap(mvs -> Observable.from(mvs))
+                .doOnNext(mv -> mv.setSource("Database"));
 
         //data sources combined
         Observable.concat(dbObs, netObs)

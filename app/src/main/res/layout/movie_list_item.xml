@@ -2,7 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="148dp"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:orientation="horizontal"
     android:clickable="true"
     android:focusable="true"
@@ -17,31 +17,40 @@
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="4dp"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_item_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/colorTextPrimary"/>
         <TextView
             android:id="@+id/tv_item_year"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textColor="@color/colorTextSecondary"/>
 
         <TextView
-            android:id="@+id/tv_item_description"
+            android:id="@+id/tv_item_genre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/colorTextSecondary"/>
+
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="@color/colorTextSecondary"/>
+            android:id="@+id/new_img"
+            android:background="@drawable/ic_store_new_badges"
+            android:visibility="invisible"/>
+
+
     </LinearLayout>
 
 </LinearLayout>

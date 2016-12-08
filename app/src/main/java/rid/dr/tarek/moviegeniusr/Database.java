@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class Database extends SQLiteOpenHelper {
     private static final String TAG = "DRRID";
@@ -33,11 +31,12 @@ public class Database extends SQLiteOpenHelper {
     private static final String COL_PATHTOPOSTER = "pToPoster";
     private static final String COL_PATHTOBACKGROUND = "pToBG";
     private static final String COL_TORRENTURL = "tURL";
+    private static final String COL_GENRE = "genre";
 
     List<Movie> movies2 = new ArrayList<Movie>();
 
     public Database(Context context) {
-        super(context, "movies14.db", null, 1);
+        super(context, "movies16.db", null, 1);
     }
 
     @Override
@@ -46,10 +45,11 @@ public class Database extends SQLiteOpenHelper {
                         ", %s TEXT, %s TEXT," +
                         "%s TEXT, %s TEXT, %s TEXT, " +
                         "%s BOOLEAN, %s BOOLEAN, %s TEXT, %s TEXT," +
-                        " %s TEXT, %s TEXT, %s TEXT, %s TEXT)", MOVIES_TABLE, COL_ID, COL_TITLE
+                        " %s TEXT, %s TEXT, %s TEXT, %s TEXT, %s TEXT)"
+                , MOVIES_TABLE, COL_ID, COL_TITLE
                 , COL_YEAR, COL_INFO, COL_RATING, COL_DURATION, COL_H_POSTER, COL_H_BG,
                 COL_B_URL, COL_SUBINFO, COL_POSTERURL, COL_PATHTOPOSTER,
-                COL_PATHTOBACKGROUND, COL_TORRENTURL);
+                COL_PATHTOBACKGROUND, COL_TORRENTURL, COL_GENRE);
 
         db.execSQL(sql);
     }
@@ -80,6 +80,7 @@ public class Database extends SQLiteOpenHelper {
             cv.put(COL_PATHTOPOSTER, movie.getPathToPoster());
             cv.put(COL_PATHTOBACKGROUND, movie.getPathToBackground());
             cv.put(COL_TORRENTURL, movie.getTorrentURL());
+            cv.put(COL_GENRE, movie.getGenre());
 
             db.insert(MOVIES_TABLE, null, cv);
         }
@@ -110,9 +111,11 @@ public class Database extends SQLiteOpenHelper {
             String pathToPoster = cursor.getString(11);
             String pathToBG = cursor.getString(12);
             String torrentURL = cursor.getString(13);
+            String genre = cursor.getString(14);
 
             Movie movie = new Movie(bURL, title, description, subinfo, rating, year,
-                    posterURL, hPoster, pathToPoster, imdbID, duration, pathToBG, hBG, torrentURL);
+                    posterURL, hPoster, pathToPoster, imdbID, duration
+                    , pathToBG, hBG, torrentURL, genre);
 
             movies.add(movie);
             db.close();

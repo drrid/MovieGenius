@@ -103,6 +103,7 @@ public class MoviePresenter {
             String poster_url = json.getString("Poster");
             String imdbID = json.getString("imdbID");
             String duration = json.getString("Runtime");
+            String genre = json.getString("Genre");
 
             // set info
             n_movie.setPosterURL(poster_url);
@@ -110,6 +111,7 @@ public class MoviePresenter {
             n_movie.setRating(rating);
             n_movie.setImdbID(imdbID);
             n_movie.setDuration(duration);
+            n_movie.setGenre(genre);
 
         } catch (IOException e) {
             Log.d(TAG, "getInfo: "+ e.getMessage());

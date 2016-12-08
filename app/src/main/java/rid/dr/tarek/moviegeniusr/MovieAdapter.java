@@ -31,7 +31,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private File path;
     private Bitmap img;
 
-    public MovieAdapter(List<Movie> myList, Context context,File path) {
+    public MovieAdapter(List<Movie> myList, Context context, File path) {
         this.myList = myList;
         this.context = context;
         this.path = path;
@@ -41,18 +41,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.movie_list_item,parent, false);
+                .inflate(R.layout.movie_list_item, parent, false);
         MovieViewHolder v_holder = new MovieViewHolder(v);
 
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int pos = v_holder.getAdapterPosition();
-                Context context1 = view.getContext();
-                Intent intent = new Intent(context1, DetailActivity.class);
-                intent.putExtra("movie", myList.get(pos));
-                context1.startActivity(intent);
-            }
+        v.setOnClickListener(view -> {
+            int pos = v_holder.getAdapterPosition();
+            Context context1 = view.getContext();
+            Intent intent = new Intent(context1, DetailActivity.class);
+            intent.putExtra("movie", myList.get(pos));
+            context1.startActivity(intent);
         });
         return v_holder;
     }
@@ -61,17 +58,21 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void onBindViewHolder(MovieViewHolder holder, int position) {
         holder.title_list_item.setText(myList.get(position).getTitle());
         holder.year_list_item.setText(myList.get(position).getYear());
-        holder.description_list_item.setText(myList.get(position).getDescription());
+        holder.genre_list_item.setText(myList.get(position).getGenre());
 
-//        if (myList.get(position).isHasPoster()){
-            img = getBitmap(position);
-            holder.poster_img_item.setImageBitmap(img);
+        img = getBitmap(position);
+        holder.poster_img_item.setImageBitmap(img);
 
-//        }
+        if (myList.get(position).getSource() == "Network") {
+            holder.new_img_item.setVisibility(View.VISIBLE);
+        } else {
+            holder.new_img_item.setVisibility(View.INVISIBLE);
+        }
+
     }
 
     private Bitmap getBitmap(int position) {
-        File file = new File(path, "/" + myList.get(position).getTitle()+".jpg");
+        File file = new File(path, "/" + myList.get(position).getTitle() + ".jpg");
         return BitmapFactory.decodeFile(file.getPath());
     }
 
@@ -80,18 +81,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         return myList.size();
     }
 
-    public class MovieViewHolder extends RecyclerView.ViewHolder{
+    public class MovieViewHolder extends RecyclerView.ViewHolder {
         TextView title_list_item;
         TextView year_list_item;
-        TextView description_list_item;
+        TextView genre_list_item;
         ImageView poster_img_item;
+        ImageView new_img_item;
 
         public MovieViewHolder(View itemView) {
             super(itemView);
-            title_list_item = (TextView)itemView.findViewById(R.id.tv_item_title);
-            year_list_item = (TextView)itemView.findViewById(R.id.tv_item_year);
-            description_list_item = (TextView)itemView.findViewById(R.id.tv_item_description);
-            poster_img_item = (ImageView)itemView.findViewById(R.id.img_poster);
+            title_list_item = (TextView) itemView.findViewById(R.id.tv_item_title);
+            year_list_item = (TextView) itemView.findViewById(R.id.tv_item_year);
+            genre_list_item = (TextView) itemView.findViewById(R.id.tv_item_genre);
+            poster_img_item = (ImageView) itemView.findViewById(R.id.img_poster);
+            new_img_item = (ImageView) itemView.findViewById(R.id.new_img);
         }
     }
 }
