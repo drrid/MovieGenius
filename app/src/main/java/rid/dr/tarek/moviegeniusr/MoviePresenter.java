@@ -235,8 +235,7 @@ public class MoviePresenter {
         Observable ob = Observable.merge(
                     Observable.defer(()->Observable.just(getInfo(movie))),
                     Observable.defer(()->Observable.just(getPoster(movie))),
-                    Observable.defer(()->Observable.just(getTorrent(movie))),
-                    Observable.defer(()->Observable.just(getBackground(movie))));
+                    Observable.defer(()->Observable.just(getTorrent(movie))));
         return ob;
     }
 
