@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 .flatMap(mv -> moviePresenter.getInfoObs(mv))
                 .doOnNext(mv -> mv.setSource("Network"))
                 .retry(10)
-                .delay(500, TimeUnit.MILLISECONDS)
+                .delay(200, TimeUnit.MILLISECONDS)
                 .doOnCompleted(() -> cacheMovies());
 
         //Database data request
@@ -74,22 +74,21 @@ public class MainActivity extends AppCompatActivity {
                 .flatMap(mvs -> Observable.from(mvs))
                 .doOnNext(mv -> mv.setSource("Database"));
 
-        //data sources combined
+        //Data sources combined
         Observable.concat(dbObs, netObs)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnEach((mv) -> pb.incrementProgressBy(1))
+                .doOnNext((mv) -> pb.incrementProgressBy(1))
                 .subscribe(
                         mv -> updateItem(mv),
                         throwable -> throwable.printStackTrace());
     }
 
     private void updateItem(Movie movie) {
-        int i = myList.indexOf(movie);
         myList.remove(movie);
-        if (myList.contains(movie)) {
-            myList.add(i, movie);
-        } else {
+        if (movie.getSource()=="Network") {
+            myList.add(0, movie);
+        } else{
             myList.add(movie);
         }
         movieAdapter.notifyDataSetChanged();
