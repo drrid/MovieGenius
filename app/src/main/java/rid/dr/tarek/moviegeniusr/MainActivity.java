@@ -7,6 +7,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import java.io.File;
@@ -57,11 +58,13 @@ public class MainActivity extends AppCompatActivity {
         //ProgressBar
         pb = (ProgressBar) findViewById(R.id.progressBar);
 
+
         //Network data request
         Observable<Movie> netObs = moviePresenter.getLMObs()
-                .doOnNext(mvs -> pb.setMax(mvs.size()))
+                .doOnNext(movies -> pb.setMax(movies.size()*3))
                 .flatMap(mvs -> Observable.from(mvs))
                 .filter(movie -> (myList.contains(movie) == false))
+                .doOnNext(movie -> Log.d(TAG, "NetCall: "+movie.getTitle()))
                 .flatMap(mv -> moviePresenter.getInfoObs(mv))
                 .doOnNext(mv -> mv.setSource("Network"))
                 .retry(10)
@@ -78,10 +81,11 @@ public class MainActivity extends AppCompatActivity {
         Observable.concat(dbObs, netObs)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext((mv) -> pb.incrementProgressBy(1))
+                .doOnNext(movie -> pb.incrementProgressBy(1))
                 .subscribe(
                         mv -> updateItem(mv),
-                        throwable -> throwable.printStackTrace());
+                        throwable -> throwable.printStackTrace(),
+                        () -> pb.setVisibility(View.INVISIBLE));
     }
 
     private void updateItem(Movie movie) {
